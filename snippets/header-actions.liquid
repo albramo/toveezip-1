@@ -365,18 +365,26 @@
   }
 
   .header-actions__cart-icon {
-    --cart-bubble-size: 20px;
-    --cart-bubble-top: 4.5px;
-    --cart-bubble-right: 2.5px;
+    --cart-bubble-size: 16px;
+    --cart-bubble-top: -6px;
+    --cart-bubble-right: -6px;
 
     position: relative;
   }
 
   .header-actions__cart-icon .cart-bubble {
     position: absolute;
-    width: var(--cart-bubble-size, 20px);
+    width: var(--cart-bubble-size, 16px);
+    height: var(--cart-bubble-size, 16px);
     top: var(--cart-bubble-top);
     right: var(--cart-bubble-right);
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    font-size: 8px !important;
+    border-radius: 50% !important;
+    background-color: #2e0808 !important;
+    color: #ffffff !important;
   }
 
   @media screen and (min-width: 750px) {
@@ -392,13 +400,7 @@
   }
 
   .header-actions__cart-icon.header-actions__cart-icon--has-cart svg {
-    /* Create donut mask where the cart bubble sits */
-    mask: radial-gradient(
-      calc(var(--cart-bubble-size) + 2px) at calc(100% - var(--cart-bubble-right)) var(--cart-bubble-top),
-      transparent 45.45%,
-      #fff 45.45%,
-      #fff 100%
-    );
+    mask: none !important; /* Cancel the cutout mask to keep the cart icon complete and beautiful */
   }
 
   .cart-bubble.cart-bubble--animating .cart-bubble__background {
@@ -415,13 +417,13 @@
   }
 
   cart-icon:has(.cart-bubble__text-count:empty) {
-    --cart-bubble-size: 10px;
-    --cart-bubble-top: 9px;
-    --cart-bubble-right: 9px;
+    --cart-bubble-size: 8px;
+    --cart-bubble-top: 1px;
+    --cart-bubble-right: 1px;
 
     .svg-wrapper {
-      --cart-bubble-top: 4px;
-      --cart-bubble-right: 4px;
+      --cart-bubble-top: 1px;
+      --cart-bubble-right: 1px;
     }
   }
 
