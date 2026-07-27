@@ -175,17 +175,17 @@
     left: 50%;
     transform: translateX(-50%) translateY(0) !important; /* Always visible */
     opacity: 1 !important; /* Always visible */
-    z-index: 999;
-    width: auto;
+    z-index: 90; /* Keep it below header and cart drawer */
+    width: 720px !important; /* Wider horizontally */
     max-width: 90%;
     border-radius: 9999px !important; /* Fully rounded pill shape */
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;
     background: #ffffff !important;
     border: 1px solid rgba(0, 0, 0, 0.06) !important;
-    padding: 10px 24px !important;
+    padding: 6px 24px !important; /* Thinner vertically */
     display: flex !important;
     align-items: center;
-    gap: 24px !important;
+    gap: 32px !important; /* Better horizontal space utilization */
     transition: opacity 0.3s ease, transform 0.3s ease !important;
 
     @starting-style {
@@ -348,6 +348,7 @@
 
   .sticky-add-to-cart__quantity input[type='number'] {
     width: 32px !important;
+    max-width: none !important; /* Prevent parent minimum-touch-target subtraction from hiding the number on mobile */
     text-align: center !important;
     border: none !important;
     background: transparent !important;
@@ -436,6 +437,7 @@
 
     .sticky-add-to-cart__quantity input[type='number'] {
       width: 24px !important;
+      max-width: none !important; /* Prevent parent minimum-touch-target subtraction from hiding the number on mobile */
       font-size: 14px !important;
     }
 
