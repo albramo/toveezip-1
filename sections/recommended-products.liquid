@@ -1,0 +1,275 @@
+<div class="recommended-products-section">
+  <div class="recommended-products__container container mx-auto px-4">
+    <h2 class="recommended-products__heading text-center">
+      {{ section.settings.heading | default: 'منتجات قد تعجبك' }}
+    </h2>
+
+    <div class="recommended-products__grid">
+      {%- liquid
+        assign products_limit = 4
+        assign counter = 0
+
+        # We fetch the latest products from the store using the 'all' collection
+        assign collection = collections['all']
+      -%}
+      {%- if collection and collection.products.size > 0 -%}
+        {%- for product in collection.products -%}
+          {%- if counter < products_limit -%}
+            {%- assign counter = counter | plus: 1 -%}
+            <a href="{{ product.url }}" class="recommended-products__card-link">
+              <div class="recommended-products__card">
+                <div class="recommended-products__image-wrapper">
+                  {%- if product.featured_media -%}
+                    {{
+                      product.featured_media
+                      | image_url: width: 600
+                      | image_tag:
+                        loading: 'lazy',
+                        class: 'recommended-products__image',
+                        widths: '300, 450, 600'
+                    }}
+                  {%- else -%}
+                    {{ 'product-1' | placeholder_svg_tag: 'recommended-products__image placeholder-svg' }}
+                  {%- endif -%}
+                </div>
+                <div class="recommended-products__card-content">
+                  <span class="recommended-products__vendor">
+                    {{ product.vendor | default: 'Shopify' }}
+                  </span>
+                  <h3 class="recommended-products__title">
+                    {{ product.title }}
+                  </h3>
+                  <div class="recommended-products__price-container">
+                    <span class="recommended-products__price">
+                      {{ product.price | money }}
+                    </span>
+                    {%- if product.compare_at_price > product.price -%}
+                      <span class="recommended-products__compare-price">
+                        {{ product.compare_at_price | money }}
+                      </span>
+                    {%- endif -%}
+                  </div>
+                </div>
+              </div>
+            </a>
+          {%- endif -%}
+        {%- endfor -%}
+      {%- else -%}
+        {%- comment -%} Fallback placeholder items if collection is empty {%- endcomment -%}
+        {%- for i in (1..4) -%}
+          <div class="recommended-products__card-link">
+            <div class="recommended-products__card">
+              <div class="recommended-products__image-wrapper">
+                {{ 'product-' | append: i | placeholder_svg_tag: 'recommended-products__image placeholder-svg' }}
+              </div>
+              <div class="recommended-products__card-content">
+                <span class="recommended-products__vendor">البائع</span>
+                <h3 class="recommended-products__title">منتج تجريبي رقم {{ i }}</h3>
+                <div class="recommended-products__price-container">
+                  <span class="recommended-products__price">100.00 ر.س</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        {%- endfor -%}
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+
+<style>
+  .recommended-products-section {
+    padding-block: 50px;
+    background-color: var(--color-background, #fff);
+    border-top: 1px solid rgba(0,0,0,0.08);
+    position: relative;
+    z-index: 1;
+    display: block;
+    width: 100%;
+  }
+
+  .recommended-products__container {
+    max-width: 1300px;
+    margin-inline: auto;
+  }
+
+  .recommended-products__heading {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 35px;
+    text-align: center;
+    color: var(--color-foreground, #000);
+    letter-spacing: -0.02em;
+  }
+
+  .recommended-products__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+  }
+
+  @media screen and (max-width: 989px) {
+    .recommended-products__grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+  }
+
+  @media screen and (max-width: 479px) {
+    .recommended-products__grid {
+      grid-template-columns: repeat(2, 1fr); /* Keep it grid layout for compact neatness */
+      gap: 12px;
+    }
+  }
+
+  .recommended-products__card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    transition: transform 0.3s ease;
+  }
+
+  .recommended-products__card-link:hover {
+    transform: translateY(-4px);
+  }
+
+  .recommended-products__card {
+    position: relative;
+    background: #ffffff; /* Clean white card base so transparent bottles display perfectly */
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    height: 0;
+    padding-bottom: 120%; /* Portrait aspect ratio perfect for products */
+    display: block;
+  }
+
+  .recommended-products__image-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: #ffffff;
+  }
+
+  .recommended-products__image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Displays full product transparent bottles without cropping */
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .recommended-products__card-link:hover .recommended-products__image {
+    transform: scale(1.08);
+  }
+
+  .recommended-products__card-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 20px;
+    z-index: 2;
+    box-sizing: border-box;
+    /* Soft premium dark gradient at the bottom for crystal clear white typography overlay on top of any image style */
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.6) 65%, rgba(0, 0, 0, 0) 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+
+  .recommended-products__vendor {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: rgba(255, 255, 255, 0.75);
+    margin-bottom: 4px;
+    text-align: right;
+  }
+
+  .recommended-products__title {
+    font-size: 16px;
+    line-height: 1.35;
+    font-weight: 700;
+    margin: 0 0 6px 0;
+    color: #ffffff;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    text-align: right;
+  }
+
+  .recommended-products__price-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+    text-align: right;
+  }
+
+  .recommended-products__price {
+    font-size: 15px;
+    font-weight: 700;
+    color: #ffffff;
+  }
+
+  .recommended-products__compare-price {
+    font-size: 13px;
+    text-decoration: line-through;
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  @media screen and (max-width: 749px) {
+    .recommended-products-section {
+      padding-block: 30px;
+    }
+    .recommended-products__heading {
+      font-size: 22px;
+      margin-bottom: 25px;
+    }
+    .recommended-products__card-content {
+      padding: 12px;
+    }
+    .recommended-products__vendor {
+      font-size: 10px;
+    }
+    .recommended-products__title {
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+    .recommended-products__price {
+      font-size: 13px;
+    }
+    .recommended-products__compare-price {
+      font-size: 11px;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Recommended Products",
+  "tag": "section",
+  "class": "recommended-products-section-wrapper",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "منتجات قد تعجبك"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Recommended Products"
+    }
+  ]
+}
+{% endschema %}
