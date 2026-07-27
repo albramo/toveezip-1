@@ -249,18 +249,18 @@
       }
     }
 
-    /* Mobile screen layout stack alignment */
+    /* Mobile screen layout stack alignment on the LEFT */
     @media (max-width: 768px) {
       .rec-media-actions {
         position: absolute !important;
-        left: auto !important;
-        right: 8px !important;
+        left: 8px !important; /* Positioned on the LEFT */
+        right: auto !important;
         bottom: 8px !important;
         top: auto !important;
         width: auto !important;
         display: flex !important;
         flex-direction: column !important;
-        align-items: flex-end !important;
+        align-items: flex-start !important; /* Align content to the left */
         gap: 6px !important;
         opacity: 1 !important;
         transform: none !important;
@@ -336,7 +336,7 @@
         position: relative !important;
         top: auto !important;
         right: auto !important;
-        justify-content: flex-end !important;
+        justify-content: flex-start !important; /* Align eye button to the LEFT */
         width: auto !important;
       }
       .rec-quick-view-btn {
@@ -1585,7 +1585,12 @@
   }
 
   /* Hide default Sale / Sold out product badges sitewide on cards */
-  .product-badges {
+  .product-badges,
+  .product-card .product-badges,
+  .rec-card .product-badges,
+  .product-badges__badge {
     display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
   }
 {% endstylesheet %}
