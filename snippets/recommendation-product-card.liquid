@@ -1,0 +1,532 @@
+{%- doc -%}
+  This snippet renders a custom product card specifically for the "You may also like" section.
+  It is based on a premium card hover-actions overlay layout.
+
+  @param {object} product - The product object
+{%- doc -%}
+
+{% liquid
+  assign onboarding = false
+  if product.id == empty or product == blank
+    assign onboarding = true
+  endif
+
+  assign product_card_id = 'rec-product-card-' | append: product.id
+  assign variant_to_link = product.selected_or_first_available_variant
+
+  assign discount_percent = 0
+  if product.compare_at_price > product.price
+    assign discount_percent = product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price
+  endif
+
+  assign featured_image = variant_to_link.featured_image
+  if featured_image == blank
+    assign featured_image = product.featured_media.preview_image
+  endif
+%}
+
+<product-card
+  class="rec-card"
+  data-product-id="{{ product.id }}"
+  id="rec-product-card-container-{{ product.id }}"
+  {% if settings.transition_to_main_product %}
+    data-product-transition="true"
+    data-featured-media-url="{{ featured_image | image_url: width: 500 }}"
+    on:click="/handleViewTransition"
+  {% endif %}
+  {% if onboarding %}
+    data-placeholder="true"
+  {% endif %}
+  {%- unless onboarding -%}
+    view-event-payload="{{ product | standard_event_data: 'view', context: 'recommendation' | escape }}"
+  {%- endunless -%}
+>
+  <a
+    id="{{ product_card_id | md5 }}"
+    {% unless onboarding %}
+      href="{{ variant_to_link.url }}"
+    {% endunless %}
+    class="rec-card__link"
+    ref="productCardLink"
+    aria-label="{{ product.title | escape }}"
+  >
+    <span class="visually-hidden">
+      {{ product.title }}
+    </span>
+  </a>
+
+  <div class="rec-card__body">
+    <div class="rec-media">
+      {%- if featured_image != blank -%}
+        <img
+          src="{{ featured_image | image_url: width: 600 }}"
+          alt="{{ featured_image.alt | default: product.title | escape }}"
+          loading="lazy"
+          width="600"
+          height="600"
+        >
+      {%- else -%}
+        {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+      {%- endif -%}
+
+      {% if discount_percent > 0 %}
+        <div class="rec-card__discount-badge">
+          <span>-{{ discount_percent }}%</span>
+        </div>
+      {% endif %}
+
+      {%- unless onboarding -%}
+        {% assign modal_id = 'qv-modal-rec-' | append: product.id %}
+        {% assign product_form_id = 'product-form-rec-card-' | append: product.id %}
+
+        <div class="rec-media-actions">
+          <!-- Quick View Section -->
+          <div class="rec-quick-view-section">
+            <button
+              type="button"
+              class="rec-quick-view-btn"
+              aria-label="Quick View"
+              onclick="event.preventDefault(); event.stopPropagation(); const m = document.getElementById('{{ modal_id }}'); if(!m) return; if(m.parentElement !== document.body) document.body.appendChild(m); if(typeof m.open === 'function') { m.open(); } else { m.classList.add('is-open'); m.setAttribute('aria-hidden', 'false'); document.body.style.overflow = 'hidden'; }"
+            >
+              <svg class="rec-icon rec-qv-icon-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+              <span>Quick View</span>
+            </button>
+          </div>
+
+          <!-- Actions Overlay Overlay (Add to Cart + Translucent Quantity Selector) -->
+          <div class="rec-overlay">
+            <product-form-component
+              data-section-id="product-rec-{{ product.id }}"
+              data-product-id="{{ product.id }}"
+              on:submit="/handleSubmit"
+              class="rec-form-wrapper"
+              data-quantity-default="{% if variant_to_link.quantity_rule.min %}{{ variant_to_link.quantity_rule.min }}{% else %}1{% endif %}"
+            >
+              {%- form 'product', product, id: product_form_id, novalidate: 'novalidate', data-type: 'add-to-cart-form' -%}
+                <input type="hidden" name="id" ref="variantId" value="{{ variant_to_link.id }}">
+                <div class="visually-hidden" ref="liveRegion" role="status"></div>
+                <button type="submit" class="rec-add-to-cart-btn" {% unless variant_to_link.available %}disabled{% endunless %} title="Add to Cart">
+                  <svg class="rec-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="9" cy="21" r="1"></circle>
+                    <circle cx="20" cy="21" r="1"></circle>
+                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                  </svg>
+                  <span>Add To Cart</span>
+                </button>
+              {%- endform -%}
+            </product-form-component>
+
+            <div class="rec-qty-stepper-wrapper">
+              {% render 'quantity-selector',
+                product: product,
+                variant: variant_to_link,
+                class: 'rec-qty-selector',
+                form_id: product_form_id
+              %}
+            </div>
+          </div>
+        </div>
+
+        {% render 'quick-view-modal', product: product, block: section %}
+      {%- endunless -%}
+    </div>
+
+    <div class="rec-body">
+      <h3 class="rec-title">{{ product.title }}</h3>
+      <div class="rec-price">
+        {% if product.compare_at_price > product.price %}
+          <span class="rec-price-old">{{ product.compare_at_price | money }}</span>
+          <span class="rec-price-new">{{ product.price | money }}</span>
+        {% else %}
+          <span class="rec-price-new" style="color: #1c1c1c;">{{ product.price | money }}</span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</product-card>
+
+<style>
+  .rec-card {
+    position: relative;
+    width: 100%;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .rec-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  }
+
+  .rec-card__link {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    background: transparent;
+  }
+
+  .rec-card__body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .rec-media {
+    position: relative;
+    aspect-ratio: 1;
+    overflow: hidden;
+    background: #f7f7f7;
+    border-radius: 16px 16px 0 0;
+  }
+
+  .rec-media img, .rec-media svg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .rec-card:hover .rec-media img {
+    transform: scale(1.05);
+  }
+
+  /* Discount badge */
+  .rec-card__discount-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 10;
+    background: #d9534f;
+    color: #fff;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  /* Hover Actions Panel */
+  .rec-media-actions {
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    bottom: 14px;
+    top: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity .3s ease, transform .3s ease;
+    pointer-events: none;
+    z-index: 12;
+  }
+
+  /* Desktop hover activation */
+  @media (hover: hover) {
+    .rec-card:hover .rec-media-actions {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+  }
+
+  /* Mobile screen fallback: keep action targets visible at all times */
+  @media (max-width: 768px) {
+    .rec-media-actions {
+      position: absolute;
+      inset: 0;
+      opacity: 1;
+      transform: none;
+      pointer-events: auto;
+      background: transparent;
+      padding: 0;
+      display: block;
+    }
+  }
+
+  /* Quick View section */
+  .rec-quick-view-section {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    pointer-events: auto;
+  }
+
+  .rec-quick-view-btn {
+    background: none;
+    border: none;
+    appearance: none;
+    -webkit-appearance: none;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.55);
+    position: relative;
+    padding: 4px 4px 6px;
+    pointer-events: auto;
+    z-index: 15;
+  }
+
+  .rec-quick-view-btn::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 0;
+    height: 1px;
+    background: #ffffff;
+    transform: translateX(-50%);
+    transition: width .25s ease;
+  }
+
+  .rec-quick-view-btn:hover::after {
+    width: 70%;
+  }
+
+  .rec-icon {
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+    stroke: currentColor;
+  }
+
+  /* Sliding eye icon hover animation */
+  .rec-qv-icon-eye {
+    width: 0;
+    opacity: 0;
+    transform: scale(0.4) rotate(-25deg);
+    transition: width .28s ease, opacity .22s ease, transform .32s cubic-bezier(.34,1.56,.64,1);
+  }
+
+  .rec-quick-view-btn:hover .rec-qv-icon-eye {
+    width: 15px;
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+
+  @media (max-width: 768px) {
+    .rec-quick-view-section {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      justify-content: flex-end;
+      width: auto;
+    }
+    .rec-quick-view-btn {
+      background: rgba(255, 255, 255, 0.9);
+      color: #1c1c1c;
+      padding: 6px;
+      border-radius: 50%;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      text-shadow: none;
+    }
+    .rec-quick-view-btn span {
+      display: none;
+    }
+    .rec-quick-view-btn .rec-qv-icon-eye {
+      width: 15px;
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* Overlay bar: Add To Cart + Translucent qty stepper */
+  .rec-overlay {
+    width: 100%;
+    background: rgba(20,20,20,0.55);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    border-radius: 10px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 6px;
+    padding: 8px;
+    box-sizing: border-box;
+    pointer-events: auto;
+    z-index: 15;
+  }
+
+  .rec-form-wrapper {
+    display: block;
+    width: 100%;
+  }
+
+  .rec-form-wrapper form {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    display: block;
+  }
+
+  .rec-add-to-cart-btn {
+    background: none;
+    border: none;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 6px 10px;
+    border-radius: 6px;
+    transition: background .2s ease, color .2s ease;
+    white-space: nowrap;
+    width: 100%;
+    height: 32px;
+    box-sizing: border-box;
+  }
+
+  .rec-add-to-cart-btn:hover {
+    background: rgba(255,255,255,0.15);
+  }
+
+  .rec-add-to-cart-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* Custom Translucent Quantity Stepper styling inside card */
+  .rec-qty-stepper-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .rec-qty-stepper-wrapper .quantity-selector {
+    background: rgba(255, 255, 255, 0.15) !important;
+    border: none !important;
+    border-radius: 6px !important;
+    padding: 2px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0 !important;
+    height: 32px !important;
+    width: 82px !important;
+    box-sizing: border-box !important;
+  }
+
+  .rec-qty-stepper-wrapper .quantity-selector input[type='number'] {
+    width: 24px !important;
+    max-width: none !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    color: #ffffff !important;
+    background: transparent !important;
+    border: none !important;
+    text-align: center !important;
+    padding: 0 !important;
+    height: 100% !important;
+  }
+
+  .rec-qty-stepper-wrapper .quantity-selector :is(.quantity-minus, .quantity-plus) {
+    width: 24px !important;
+    height: 24px !important;
+    min-width: 24px !important;
+    min-height: 24px !important;
+    border: none !important;
+    background: transparent !important;
+    color: #ffffff !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    transition: background 0.2s ease !important;
+    border-radius: 4px !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .rec-qty-stepper-wrapper .quantity-selector :is(.quantity-minus, .quantity-plus):hover {
+    background: rgba(255, 255, 255, 0.2) !important;
+  }
+
+  .rec-qty-stepper-wrapper .quantity-selector svg {
+    width: 8px !important;
+    height: 8px !important;
+    fill: currentColor !important;
+    stroke: currentColor !important;
+    color: #ffffff !important;
+  }
+
+  @media (max-width: 768px) {
+    .rec-overlay {
+      position: absolute;
+      bottom: 8px;
+      left: 8px;
+      right: 8px;
+      width: calc(100% - 16px);
+      background: rgba(20,20,20,0.8);
+    }
+  }
+
+  /* Body & Price details */
+  .rec-body {
+    padding: 12px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    flex: 1;
+  }
+
+  .rec-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1c1c1c;
+    margin: 0;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .rec-price {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    direction: ltr;
+    margin-top: 2px;
+  }
+
+  .rec-price-old {
+    font-size: 11px;
+    color: #a3a3a3;
+    text-decoration: line-through;
+    font-weight: 400;
+  }
+
+  .rec-price-new {
+    font-size: 13px;
+    color: #d9534f;
+    font-weight: 700;
+  }
+</style>
