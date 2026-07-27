@@ -439,23 +439,24 @@
       background: rgba(0, 0, 0, 0.04) !important;
       border: none !important;
       border-radius: 5px !important;
-      padding: 4px 6px !important;
+    padding: 2px !important;
       display: flex !important;
       align-items: center !important;
-      gap: 8px !important;
-      height: auto !important;
-      width: auto !important;
-      min-width: 0 !important;
+    gap: 4px !important;
+    height: 34px !important; /* Prominent desktop height */
+    width: 92px !important;  /* Wider layout for larger buttons */
+    min-width: 92px !important;
+    max-width: 92px !important;
       box-shadow: none !important;
       box-sizing: border-box !important;
     }
 
     .rec-qty-stepper-wrapper .quantity-selector input[type='number'] {
-      width: 14px !important;
-      min-width: 14px !important;
-      max-width: 14px !important;
+    width: 18px !important;
+    min-width: 18px !important;
+    max-width: 18px !important;
       font-size: 13px !important;
-      font-weight: 400 !important;
+    font-weight: 700 !important;
       color: #1c1c1c !important;
       background: transparent !important;
       border: none !important;
@@ -469,16 +470,16 @@
       background: rgba(0, 0, 0, 0.04) !important;
       border: none !important;
       color: #1c1c1c !important;
-      width: 20px !important;
-      height: 20px !important;
-      min-width: 20px !important;
-      min-height: 20px !important;
+    width: 24px !important;  /* Large easy-to-click buttons on desktop */
+    height: 24px !important;
+    min-width: 24px !important;
+    min-height: 24px !important;
       border-radius: 5px !important;
       display: flex !important;
       align-items: center !important;
       justify-content: center !important;
       cursor: pointer !important;
-      font-size: 14px !important;
+    font-size: 15px !important;
       line-height: 1 !important;
       padding: 0 !important;
       box-shadow: none !important;
@@ -492,8 +493,8 @@
 
     .rec-qty-stepper-wrapper .quantity-selector button.quantity-minus svg,
     .rec-qty-stepper-wrapper .quantity-selector button.quantity-plus svg {
-      width: 10px !important;
-      height: 10px !important;
+    width: 11px !important;
+    height: 11px !important;
       fill: none !important;
       stroke: #1c1c1c !important;
       color: #1c1c1c !important;
@@ -558,12 +559,12 @@
       .rec-qty-stepper-wrapper,
       .rec-qty-stepper-wrapper .quantity-selector-wrapper,
       .rec-qty-stepper-wrapper .quantity-selector {
-        width: 68px !important; /* Enlarged slightly for perfect balance and easier clicking */
-        min-width: 68px !important;
-        max-width: 68px !important;
+        width: 80px !important; /* Enlarged further to accommodate large, tap-friendly buttons */
+        min-width: 80px !important;
+        max-width: 80px !important;
         flex: none !important;
         display: inline-flex !important;
-        height: 24px !important; /* Heightened slightly */
+        height: 28px !important; /* Heightened to 28px for beautiful visual proportion */
         padding: 0 !important;
         margin: 0 !important;
         box-shadow: none !important;
@@ -571,7 +572,7 @@
         background: rgba(0, 0, 0, 0.04) !important;
         border-radius: 10px !important;
         box-sizing: border-box !important;
-        --quantity-selector-width: 68px !important;
+        --quantity-selector-width: 80px !important;
         gap: 2px !important;
         justify-content: center !important;
       }
@@ -580,12 +581,12 @@
       .rec-qty-stepper-wrapper .quantity-selector button.quantity-plus {
         background: transparent !important;
         color: #1c1c1c !important;
-        width: 18px !important; /* Enlarged plus and minus buttons for improved clickability */
-        height: 18px !important;
-        min-width: 18px !important;
-        min-height: 18px !important;
-        max-width: 18px !important;
-        max-height: 18px !important;
+        width: 22px !important; /* Enlarged to 22px so the tap targets are huge and extremely easy to click */
+        height: 22px !important;
+        min-width: 22px !important;
+        min-height: 22px !important;
+        max-width: 22px !important;
+        max-height: 22px !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
@@ -596,17 +597,17 @@
 
       .rec-qty-stepper-wrapper .quantity-selector button.quantity-minus svg,
       .rec-qty-stepper-wrapper .quantity-selector button.quantity-plus svg {
-        width: 10px !important; /* Larger SVGs inside plus and minus */
-        height: 10px !important;
+        width: 11px !important; /* Larger SVGs inside plus and minus */
+        height: 11px !important;
         stroke: #1c1c1c !important;
         margin: 0 !important;
         padding: 0 !important;
       }
 
       .rec-qty-stepper-wrapper .quantity-selector input[type='number'] {
-        width: 18px !important; /* Perfect cozy centered spacing */
-        min-width: 18px !important;
-        max-width: 18px !important;
+        width: 20px !important; /* Perfect cozy centered spacing */
+        min-width: 20px !important;
+        max-width: 20px !important;
         font-size: 11px !important;
         font-weight: 700 !important;
         color: #1c1c1c !important;
