@@ -169,6 +169,12 @@
 
 <style>
 
+  html:has(theme-drawer[open]) .sticky-add-to-cart__bar {
+    display: none !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+
   .sticky-add-to-cart__bar {
     position: fixed;
     bottom: 24px;
@@ -284,10 +290,32 @@
   }
 
   .sticky-add-to-cart__price {
-    font-weight: 600;
-    color: #2e0808 !important;
     display: inline-flex;
     align-items: center;
+  }
+
+  .sticky-add-to-cart__price [ref="priceContainer"] {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    flex-wrap: nowrap !important;
+  }
+
+  .sticky-add-to-cart__price .product-card__badge--sale {
+    background-color: #2e0808 !important;
+    color: #ffffff !important;
+    font-size: 11px !important;
+    font-weight: bold !important;
+    padding: 3px 8px !important;
+    border-radius: 6px !important;
+    white-space: nowrap !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    line-height: 1 !important;
+    margin: 0 !important;
   }
 
   .sticky-add-to-cart__price .price-item--sale {
