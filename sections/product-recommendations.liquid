@@ -96,7 +96,12 @@
       {% capture list_items %}
         {% for product in products limit: section.settings.max_products %}
           <div class="resource-list__item">
-            {% render 'recommendation-product-card', product: product %}
+            {% content_for 'block',
+              type: '_product-card',
+              id: 'static-product-card',
+              closest.product: product,
+              product_view_context: 'recommendation'
+            %}
           </div>
           {% unless forloop.last %}
             <!--@list/split-->
