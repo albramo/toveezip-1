@@ -87,18 +87,8 @@
     </a>
 
     <div class="rec-card__body">
-      <div class="rec-media">
-        {%- if featured_image != blank -%}
-          <img
-            src="{{ featured_image | image_url: width: 600 }}"
-            alt="{{ featured_image.alt | default: product.title | escape }}"
-            loading="lazy"
-            width="600"
-            height="600"
-          >
-        {%- else -%}
-          {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
-        {%- endif -%}
+      <div class="product-card__gallery rec-media">
+        {{ children }}
 
         {% if discount_percent > 0 %}
           <div class="rec-card__discount-badge">
@@ -107,8 +97,8 @@
         {% endif %}
 
         {%- unless onboarding -%}
-          {% assign modal_id = 'qv-modal-rec-' | append: product.id %}
-          {% assign product_form_id = 'product-form-rec-card-' | append: product.id %}
+          {% assign modal_id = 'qv-modal-' | append: block.id | append: '-' | append: product.id %}
+          {% assign product_form_id = 'product-form-card-' | append: product.id | append: '-' | append: block.id %}
 
           <div class="rec-media-actions">
             <!-- Quick View Section -->
@@ -130,7 +120,7 @@
             <!-- Actions Overlay Overlay (Add to Cart + Translucent Quantity Selector) -->
             <div class="rec-overlay">
               <product-form-component
-                data-section-id="product-rec-{{ product.id }}"
+                data-section-id="{{ block.id }}"
                 data-product-id="{{ product.id }}"
                 on:submit="/handleSubmit"
                 class="rec-form-wrapper"
@@ -161,7 +151,7 @@
             </div>
           </div>
 
-          {% render 'quick-view-modal', product: product, block: section %}
+          {% render 'quick-view-modal', product: product, block: block %}
         {%- endunless -%}
       </div>
 
