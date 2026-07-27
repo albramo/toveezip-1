@@ -236,7 +236,7 @@
       opacity: 0;
       transform: translateY(14px);
       transition: opacity .25s ease, transform .25s ease;
-      pointer-events: none;
+      pointer-events: none !important; /* Allow hover/swap to pass straight through */
       z-index: 12;
     }
 
@@ -245,7 +245,7 @@
       .rec-card:hover .rec-media-actions {
         opacity: 1 !important;
         transform: translateY(0) !important;
-        pointer-events: auto !important;
+        pointer-events: none !important; /* Keep passing through to trigger card swap */
       }
     }
 
@@ -256,7 +256,7 @@
         inset: 0;
         opacity: 1 !important;
         transform: none !important;
-        pointer-events: auto !important;
+        pointer-events: none !important;
         background: transparent;
         padding: 0;
         display: block;
@@ -268,7 +268,7 @@
       display: flex;
       justify-content: center;
       width: 100%;
-      pointer-events: auto;
+      pointer-events: auto !important; /* Capture click events specifically on the button */
     }
 
     .rec-quick-view-btn {
@@ -292,6 +292,7 @@
       pointer-events: auto !important;
       z-index: 15 !important;
       box-shadow: none !important;
+      text-decoration: none !important;
     }
 
     .rec-quick-view-btn::after {
@@ -320,16 +321,17 @@
 
     /* Sliding eye icon hover animation */
     .rec-qv-icon-eye {
-      max-width: 0;
-      opacity: 0;
+      width: 0 !important;
+      opacity: 0 !important;
+      overflow: hidden !important;
       transform: scale(0.4) rotate(-25deg);
-      transition: max-width .28s ease, opacity .22s ease, transform .32s cubic-bezier(.34,1.56,.64,1);
+      transition: width .28s ease, opacity .22s ease, transform .32s cubic-bezier(.34,1.56,.64,1) !important;
     }
 
     .rec-quick-view-btn:hover .rec-qv-icon-eye {
-      max-width: 16px;
-      opacity: 1;
-      transform: scale(1) rotate(0deg);
+      width: 16px !important;
+      opacity: 1 !important;
+      transform: scale(1) rotate(0deg) !important;
     }
 
     @media (max-width: 768px) {
@@ -352,9 +354,9 @@
         display: none;
       }
       .rec-quick-view-btn .rec-qv-icon-eye {
-        max-width: 16px;
-        opacity: 1;
-        transform: none;
+        width: 16px !important;
+        opacity: 1 !important;
+        transform: none !important;
       }
     }
 
@@ -367,7 +369,7 @@
       border-radius: 10px !important;
       display: flex !important;
       align-items: center !important;
-      justify-content: space-between !important;
+      justify-content: center !important; /* Centered content side-by-side */
       gap: 8px !important;
       padding: 10px 8px !important;
       color: #ffffff !important;
@@ -375,20 +377,20 @@
       border: none !important;
       box-sizing: border-box !important;
       height: 42px !important;
-      pointer-events: auto !important;
+      pointer-events: auto !important; /* Capture click events specifically on the overlay */
       z-index: 15 !important;
     }
 
     .rec-form-wrapper {
       display: block;
-      width: auto;
-      flex: 1;
+      width: auto !important;
+      flex: none !important;
     }
 
     .rec-form-wrapper form {
       margin: 0;
       padding: 0;
-      width: 100%;
+      width: auto !important;
       display: block;
     }
 
@@ -396,7 +398,7 @@
       background: none !important;
       border: none !important;
       color: #ffffff !important;
-      display: flex !important;
+      display: inline-flex !important;
       align-items: center !important;
       gap: 4px !important;
       cursor: pointer !important;
@@ -456,7 +458,8 @@
       height: auto !important;
     }
 
-    .rec-qty-stepper-wrapper .quantity-selector :is(.quantity-minus, .quantity-plus) {
+    .rec-qty-stepper-wrapper .quantity-selector button.quantity-minus,
+    .rec-qty-stepper-wrapper .quantity-selector button.quantity-plus {
       background: rgba(255, 255, 255, 0.12) !important;
       border: none !important;
       color: #ffffff !important;
@@ -476,15 +479,17 @@
       transition: background 0.2s ease !important;
     }
 
-    .rec-qty-stepper-wrapper .quantity-selector :is(.quantity-minus, .quantity-plus):hover {
+    .rec-qty-stepper-wrapper .quantity-selector button.quantity-minus:hover,
+    .rec-qty-stepper-wrapper .quantity-selector button.quantity-plus:hover {
       background: rgba(255, 255, 255, 0.28) !important;
     }
 
-    .rec-qty-stepper-wrapper .quantity-selector svg {
-      width: 8px !important;
-      height: 8px !important;
-      fill: currentColor !important;
-      stroke: currentColor !important;
+    .rec-qty-stepper-wrapper .quantity-selector button.quantity-minus svg,
+    .rec-qty-stepper-wrapper .quantity-selector button.quantity-plus svg {
+      width: 10px !important;
+      height: 10px !important;
+      fill: none !important;
+      stroke: #ffffff !important;
       color: #ffffff !important;
     }
 
