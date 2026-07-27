@@ -314,6 +314,21 @@ class StickyAddToCartComponent extends Component {
 
     this.#currentQuantity = event.detail.quantity;
     this.#updateButtonText();
+
+    // Sync all quantity inputs on the product page
+    const sectionElement = this.closest('.shopify-section');
+    if (sectionElement) {
+      const quantityInputs = sectionElement.querySelectorAll('quantity-selector-component input[name="quantity"]');
+      quantityInputs.forEach(input => {
+        if (parseInt(input.value) !== this.#currentQuantity) {
+          input.value = this.#currentQuantity;
+          const component = input.closest('quantity-selector-component');
+          if (component && typeof component.updateButtonStates === 'function') {
+            component.updateButtonStates();
+          }
+        }
+      });
+    }
   };
 
   /**
