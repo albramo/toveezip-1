@@ -505,8 +505,8 @@
         bottom: auto !important;
         left: auto !important;
         right: auto !important;
-        width: auto !important;
-        max-width: none !important;
+        width: 110px !important; /* Shorten horizontal width explicitly to be super compact! */
+        max-width: 110px !important;
         background: rgba(255, 255, 255, 0.85) !important;
         backdrop-filter: blur(8px) !important;
         -webkit-backdrop-filter: blur(8px) !important;
@@ -515,9 +515,24 @@
         border-radius: 20px !important;
         display: flex !important;
         align-items: center !important;
-        gap: 4px !important; /* Tight gap */
+        justify-content: space-between !important;
+        gap: 2px !important; /* Tight gap */
         height: 28px !important; /* Super compact height */
         box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
+        box-sizing: border-box !important;
+      }
+
+      .rec-form-wrapper {
+        display: inline-flex !important;
+        width: auto !important;
+        flex: none !important;
+      }
+
+      .rec-form-wrapper form {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: auto !important;
+        display: inline-flex !important;
       }
 
       /* Hide Add to Cart text on mobile screens to save space */
@@ -529,6 +544,9 @@
         padding: 0 !important;
         height: 20px !important;
         width: 20px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
       }
 
       .rec-add-to-cart-btn svg {
