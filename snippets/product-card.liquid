@@ -93,23 +93,66 @@
           <span>-{{ discount_percent }}%</span>
         </div>
       {% endif %}
+
+      {{ children }}
+
       {%- unless onboarding -%}
         {% assign modal_id = 'qv-modal-' | append: block.id | append: '-' | append: product.id %}
-        <button
-          type="button"
-          class="product-card__quick-view-btn"
-          aria-label="Quick View"
-          onclick="event.preventDefault(); event.stopPropagation(); const m = document.getElementById('{{ modal_id }}'); if(!m) return; if(m.parentElement !== document.body) document.body.appendChild(m); if(typeof m.open === 'function') { m.open(); } else { m.classList.add('is-open'); m.setAttribute('aria-hidden', 'false'); document.body.style.overflow = 'hidden'; }"
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-            <circle cx="12" cy="12" r="3"></circle>
-          </svg>
-        </button>
+        {% assign product_form_id = 'product-form-card-' | append: product.id | append: '-' | append: block.id %}
+
+        <div class="product-card__media-actions">
+          <!-- Quick View section -->
+          <div class="product-card__quick-view-section">
+            <button
+              type="button"
+              class="product-card__quick-view-btn"
+              aria-label="Quick View"
+              onclick="event.preventDefault(); event.stopPropagation(); const m = document.getElementById('{{ modal_id }}'); if(!m) return; if(m.parentElement !== document.body) document.body.appendChild(m); if(typeof m.open === 'function') { m.open(); } else { m.classList.add('is-open'); m.setAttribute('aria-hidden', 'false'); document.body.style.overflow = 'hidden'; }"
+            >
+              <svg class="product-card__qv-icon-eye" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+              <span>Quick View</span>
+            </button>
+          </div>
+
+          <!-- Overlay bar with Add to Cart and Qty Stepper -->
+          <div class="product-card__overlay">
+            <product-form-component
+              data-section-id="{{ block.id }}"
+              data-product-id="{{ product.id }}"
+              on:submit="/handleSubmit"
+              class="product-card__form-wrapper"
+              data-quantity-default="{% if variant_to_link.quantity_rule.min %}{{ variant_to_link.quantity_rule.min }}{% else %}1{% endif %}"
+            >
+              {%- form 'product', product, id: product_form_id, novalidate: 'novalidate', data-type: 'add-to-cart-form' -%}
+                <input type="hidden" name="id" ref="variantId" value="{{ variant_to_link.id }}">
+                <div class="visually-hidden" ref="liveRegion" role="status"></div>
+                <button type="submit" class="product-card__buy-btn" {% unless variant_to_link.available %}disabled{% endunless %} title="Add to cart">
+                  <svg class="product-card__btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="9" cy="21" r="1"></circle>
+                    <circle cx="20" cy="21" r="1"></circle>
+                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                  </svg>
+                  <span>Add To Cart</span>
+                </button>
+              {%- endform -%}
+            </product-form-component>
+
+            <div class="product-card__qty-wrapper">
+              {% render 'quantity-selector',
+                product: product,
+                variant: variant_to_link,
+                class: 'product-card__qty-selector',
+                form_id: product_form_id
+              %}
+            </div>
+          </div>
+        </div>
 
         {% render 'quick-view-modal', product: product, block: block %}
       {%- endunless -%}
-      {{ children }}
     </div>
 
     <div
@@ -126,42 +169,12 @@
       "
     >
       {% unless onboarding %}
-        {% assign product_form_id = 'product-form-card-' | append: product.id | append: '-' | append: block.id %}
         <h3 class="product-card__title">{{ product.title }}</h3>
         <div class="product-card__price">
           <span class="product-card__current-price{% if discount_percent > 0 %} product-card__current-price--sale{% endif %}">{{ product.price | money }}</span>
           {% if discount_percent > 0 %}
             <span class="product-card__compare-price">{{ product.compare_at_price | money }}</span>
           {% endif %}
-        </div>
-        <div class="product-card__actions">
-          <div class="product-card__qty">
-            {% render 'quantity-selector',
-              product: product,
-              variant: variant_to_link,
-              class: 'product-card__qty-selector',
-              form_id: product_form_id
-            %}
-          </div>
-          <product-form-component
-            data-section-id="{{ block.id }}"
-            data-product-id="{{ product.id }}"
-            on:submit="/handleSubmit"
-            class="product-card__form-wrapper"
-            data-quantity-default="{% if variant_to_link.quantity_rule.min %}{{ variant_to_link.quantity_rule.min }}{% else %}1{% endif %}"
-          >
-            {%- form 'product', product, id: product_form_id, novalidate: 'novalidate', data-type: 'add-to-cart-form' -%}
-              <input type="hidden" name="id" ref="variantId" value="{{ variant_to_link.id }}">
-              <div class="visually-hidden" ref="liveRegion" role="status"></div>
-              {% render 'add-to-cart-button',
-                add_to_cart_text: 'Add to cart',
-                class: 'product-card__buy-btn',
-                can_add_to_cart: variant_to_link.available,
-                product: product,
-                icon_only_on_mobile: true
-              %}
-            {%- endform -%}
-          </product-form-component>
         </div>
       {% endunless %}
     </div>
