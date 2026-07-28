@@ -82,10 +82,6 @@ export class AddToCartComponent extends Component {
       }
     }
     if (this.refs.addToCartButton.dataset.puppet !== 'true') {
-      const animationEnabled = this.dataset.addToCartAnimation === 'true';
-      if (animationEnabled && !event.target.closest('.quick-add-modal')) {
-        this.#animateFlyToCart();
-      }
       this.animateAddToCart();
     }
   }
@@ -97,32 +93,6 @@ export class AddToCartComponent extends Component {
 
     preloadImage(image);
   };
-
-  /**
-   * Animates the fly to cart animation.
-   */
-  #animateFlyToCart() {
-    const { addToCartButton } = this.refs;
-    const cartIcon = document.querySelector('.header-actions__cart-icon');
-
-    const image = this.dataset.productVariantMedia;
-
-    if (!cartIcon || !addToCartButton || !image) return;
-
-    const flyToCartElement = /** @type {FlyToCart} */ (document.createElement('fly-to-cart'));
-
-    let flyToCartClass = addToCartButton.classList.contains('quick-add__button')
-      ? 'fly-to-cart--quick'
-      : 'fly-to-cart--main';
-
-    flyToCartElement.classList.add(flyToCartClass);
-    flyToCartElement.style.setProperty('background-image', `url(${image})`);
-    flyToCartElement.style.setProperty('--start-opacity', '0');
-    flyToCartElement.source = addToCartButton;
-    flyToCartElement.destination = cartIcon;
-
-    document.body.appendChild(flyToCartElement);
-  }
 
   /**
    * Animates the add to cart button.
@@ -389,6 +359,12 @@ class ProductFormComponent extends Component {
       }
     }
 
+    const formButtons = this.querySelectorAll('button[type="submit"], [ref="addToCartButton"]');
+    for (const btn of formButtons) {
+      btn.disabled = true;
+      btn.classList.add('is-loading');
+    }
+
     const formData = new FormData(form);
 
     if (overrideVariantId) {
@@ -447,6 +423,13 @@ class ProductFormComponent extends Component {
             })
           );
 
+          // Restore buttons
+          const formButtons = this.querySelectorAll('button[type="submit"], [ref="addToCartButton"]');
+          for (const btn of formButtons) {
+            btn.disabled = false;
+            btn.classList.remove('is-loading');
+          }
+
           // Fetch the updated cart to get the actual total quantity for this variant
           this.#refreshCart()
             .then((ajaxCart) =>
@@ -498,6 +481,19 @@ class ProductFormComponent extends Component {
 
           if (!id) throw new Error('Form ID is required');
 
+          // Restore buttons
+          const formButtons = this.querySelectorAll('button[type="submit"], [ref="addToCartButton"]');
+          for (const btn of formButtons) {
+            btn.disabled = false;
+            btn.classList.remove('is-loading');
+          }
+
+          // Automatically open the cart drawer!
+          setTimeout(() => {
+            const drawer = document.querySelector('theme-drawer#cart-drawer');
+            if (drawer?.open) drawer.open();
+          }, 80);
+
           // Add aria-live region to inform screen readers that the item was added
           // Get the added text from any add-to-cart button
           const anyAddToCartButton = allAddToCartContainers[0]?.refs.addToCartButton;
@@ -547,6 +543,13 @@ class ProductFormComponent extends Component {
             code: 'SERVICE_UNAVAILABLE',
           })
         );
+
+        // Restore buttons
+        const formButtons = this.querySelectorAll('button[type="submit"], [ref="addToCartButton"]');
+        for (const btn of formButtons) {
+          btn.disabled = false;
+          btn.classList.remove('is-loading');
+        }
       })
       .finally(() => {
         if (event) {
@@ -560,6 +563,12 @@ class ProductFormComponent extends Component {
     if (items.length === 0) return;
 
     const { addToCartTextError } = this.refs;
+
+    const formButtons = this.querySelectorAll('button[type="submit"], [ref="addToCartButton"]');
+    for (const btn of formButtons) {
+      btn.disabled = true;
+      btn.classList.add('is-loading');
+    }
 
     if (this.#timeout) clearTimeout(this.#timeout);
 
@@ -616,6 +625,13 @@ class ProductFormComponent extends Component {
             })
           );
 
+          // Restore buttons
+          const formButtons = this.querySelectorAll('button[type="submit"], [ref="addToCartButton"]');
+          for (const btn of formButtons) {
+            btn.disabled = false;
+            btn.classList.remove('is-loading');
+          }
+
           this.#refreshCart()
             .then((ajaxCart) =>
               deferredEventPromise.resolve({
@@ -655,6 +671,19 @@ class ProductFormComponent extends Component {
           addToCartTextError.removeAttribute('aria-live');
         }
 
+        // Restore buttons
+        const formButtons = this.querySelectorAll('button[type="submit"], [ref="addToCartButton"]');
+        for (const btn of formButtons) {
+          btn.disabled = false;
+          btn.classList.remove('is-loading');
+        }
+
+        // Automatically open the cart drawer!
+        setTimeout(() => {
+          const drawer = document.querySelector('theme-drawer#cart-drawer');
+          if (drawer?.open) drawer.open();
+        }, 80);
+
         const allAddToCartContainers = /** @type {NodeListOf<AddToCartComponent>} */ (
           this.querySelectorAll('add-to-cart-component')
         );
@@ -691,6 +720,13 @@ class ProductFormComponent extends Component {
             code: 'SERVICE_UNAVAILABLE',
           })
         );
+
+        // Restore buttons
+        const formButtons = this.querySelectorAll('button[type="submit"], [ref="addToCartButton"]');
+        for (const btn of formButtons) {
+          btn.disabled = false;
+          btn.classList.remove('is-loading');
+        }
       });
   }
 
