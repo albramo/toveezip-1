@@ -1232,6 +1232,7 @@ results-list[initialized] {
 .button-secondary,
 .button-custom,
 button.shopify-payment-button__button--unbranded {
+  --loader-color: var(--button-color, currentColor);
   --text-align: center;
 
   display: grid;
@@ -4034,7 +4035,7 @@ button.is-loading::after,
   height: 18px !important;
   margin-top: -9px !important;
   margin-left: -9px !important;
-  border: 2px solid currentColor !important;
+  border: 2px solid var(--loader-color, #ffffff) !important;
   border-top-color: transparent !important;
   border-radius: 50% !important;
   animation: spin-loader 0.6s linear infinite !important;
