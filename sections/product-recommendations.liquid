@@ -178,10 +178,9 @@
         class="resource-list resource-list--grid"
       >
         {% for i in (1..section.settings.columns) %}
-          <div
-            class="product-recommendations__skeleton-item"
-            aria-label="{{ 'accessibility.loading_product_recommendations' | t }}"
-          ></div>
+          <div class="resource-list__item" aria-label="{{ 'accessibility.loading_product_recommendations' | t }}">
+            {% render 'product-card-skeleton' %}
+          </div>
         {% endfor %}
       </div>
     {%- endif -%}

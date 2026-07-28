@@ -74,7 +74,7 @@ class CartDrawerComponent extends Component {
       event.target instanceof Element ? event.target.closest('dialog:modal') : null
     );
 
-    if (shouldAutoOpen && !sourceModal && !this.#isCartEmpty()) {
+    if (shouldAutoOpen && !sourceModal) {
       this.#themeDrawer?.open();
     }
 
