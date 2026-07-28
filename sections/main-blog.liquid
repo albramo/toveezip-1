@@ -37,8 +37,6 @@
 
             <div class="blog-card__content">
               <div class="blog-card__meta">
-                <span class="blog-card__blog-title">{{ blog.title }}</span>
-                <span class="blog-card__separator">•</span>
                 <time datetime="{{ article.published_at | date: '%Y-%m-%d' }}" class="blog-card__date">
                   {{ article.published_at | time_tag: format: 'date' }}
                 </time>
@@ -49,24 +47,6 @@
                   {{ article.title }}
                 </a>
               </h2>
-
-              <p class="blog-card__excerpt">
-                {%- if article.excerpt != blank -%}
-                  {{ article.excerpt | strip_html | truncatewords: 25 }}
-                {%- else -%}
-                  {{ article.content | strip_html | truncatewords: 25 }}
-                {%- endif -%}
-              </p>
-
-              <div class="blog-card__footer">
-                <a href="{{ article.url }}" class="blog-card__read-more-btn">
-                  {{ 'content.read_more' | t | default: 'Read More' }}
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                    <polyline points="12 5 19 12 12 19"></polyline>
-                  </svg>
-                </a>
-              </div>
             </div>
           </article>
         {%- endfor -%}
