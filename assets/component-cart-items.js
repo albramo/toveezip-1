@@ -57,6 +57,7 @@ export class CartItemsComponent extends createViewEventElement(Component) {
   /** @param {CartDiscountUpdateEvent} event */
   #handleDiscountUpdate = (event) => {
     const external = this.#isExternalCartUpdate(event);
+    this.setAttribute('data-loading', 'true');
     event.promise
       ?.then(({ detail }) => {
         const sectionsHtml = detail?.sections?.[this.sectionId];
@@ -75,6 +76,9 @@ export class CartItemsComponent extends createViewEventElement(Component) {
       })
       .catch((error) => {
         if (error?.name !== 'AbortError') console.warn('[cart-items] Event promise rejected:', error);
+      })
+      .finally(() => {
+        this.removeAttribute('data-loading');
       });
   };
 
@@ -83,6 +87,7 @@ export class CartItemsComponent extends createViewEventElement(Component) {
     // Internal cart-note dispatches don't need a section refresh — the user typed the
     // value and the textarea retains it. Only external callers need the UI synced.
     if (!this.#isExternalCartUpdate(event)) return;
+    this.setAttribute('data-loading', 'true');
     event.promise
       ?.then(({ detail }) => {
         const sections = /** @type {Record<string, string> | undefined} */ (detail?.sections);
@@ -98,6 +103,9 @@ export class CartItemsComponent extends createViewEventElement(Component) {
       })
       .catch((error) => {
         if (error?.name !== 'AbortError') console.warn('[cart-items] Event promise rejected:', error);
+      })
+      .finally(() => {
+        this.removeAttribute('data-loading');
       });
   };
 
@@ -209,6 +217,7 @@ export class CartItemsComponent extends createViewEventElement(Component) {
     const cartPerformaceUpdateMarker = cartPerformance.createStartingMarker(`${config.action}:user-action`);
 
     this.#disableCartItems();
+    this.setAttribute('data-loading', 'true');
 
     const { line, quantity } = config;
     const { cartTotal } = this.refs;
@@ -298,6 +307,7 @@ export class CartItemsComponent extends createViewEventElement(Component) {
       })
       .finally(() => {
         this.#enableCartItems();
+        this.removeAttribute('data-loading');
         cartPerformance.measureFromMarker(cartPerformaceUpdateMarker);
       });
   }
@@ -340,6 +350,8 @@ export class CartItemsComponent extends createViewEventElement(Component) {
    */
   #handleCartUpdate = (event) => {
     if (event.target === this) return;
+
+    this.setAttribute('data-loading', 'true');
 
     event.promise
       ?.then(async ({ detail }) => {
@@ -385,6 +397,9 @@ export class CartItemsComponent extends createViewEventElement(Component) {
       })
       .catch((error) => {
         if (error?.name !== 'AbortError') console.warn('[cart-items] Event promise rejected:', error);
+      })
+      .finally(() => {
+        this.removeAttribute('data-loading');
       });
   };
 
