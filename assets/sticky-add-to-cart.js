@@ -109,64 +109,11 @@ class StickyAddToCartComponent extends Component {
    */
   #setupIntersectionObserver() {
     const productForm = this.#getProductForm();
-    if (!productForm) return;
-
-    const buyButtonsBlock = productForm.closest('.buy-buttons-block');
-    if (!buyButtonsBlock) return;
-
-    // In themes migrated from 2.0, the footer element doesn't exist
-    const footer = document.querySelector('footer') ?? document.querySelector('[class*="footer-group"]');
-    if (!footer) return;
-
-    // Observer for buy buttons visibility
-    this.#buyButtonsIntersectionObserver = new IntersectionObserver((entries) => {
-      const [entry] = entries;
-      if (!entry) return;
-
-      // Only show sticky bar if buy buttons have been scrolled past (above viewport)
-      if (!entry.isIntersecting && !this.#isStuck) {
-        // Check if the element is above the viewport (scrolled past) or below (not yet reached)
-        const rect = entry.target.getBoundingClientRect();
-        if (rect.bottom < 0 || rect.top < 0) {
-          if (this.#isChatActive()) return;
-          this.#showStickyBar();
-        }
-        // If rect.top >= 0, element is below viewport - don't show sticky bar yet
-      } else if (entry.isIntersecting && this.#isStuck) {
-        this.#hiddenByBottom = false;
-        this.#hideStickyBar();
-      }
-    });
-
-    // Observer for footer visibility - hides sticky bar at page bottom
-    this.#mainBottomObserver = new IntersectionObserver(
-      (entries) => {
-        const [entry] = entries;
-        if (!entry) return;
-
-        if (entry.isIntersecting && this.#isStuck) {
-          this.#hiddenByBottom = true;
-          this.#hideStickyBar();
-        } else if (!entry.isIntersecting && this.#hiddenByBottom) {
-          // Footer out of view - check if we should show sticky bar again
-          const rect = buyButtonsBlock.getBoundingClientRect();
-          // Only show if buy buttons are above the viewport (scrolled past)
-          if (rect.bottom < 0 || rect.top < 0) {
-            this.#hiddenByBottom = false;
-            if (!this.#isChatActive()) {
-              this.#showStickyBar();
-            }
-          }
-        }
-      },
-      {
-        rootMargin: '200px 0px 0px 0px',
-      }
-    );
-
-    this.#buyButtonsIntersectionObserver.observe(buyButtonsBlock);
-    this.#mainBottomObserver.observe(footer);
-    this.#targetAddToCartButton = productForm.querySelector('[ref="addToCartButton"]');
+    if (productForm) {
+      this.#targetAddToCartButton = productForm.querySelector('[ref="addToCartButton"]');
+    }
+    // Always show the sticky bar permanently!
+    this.#showStickyBar();
   }
 
   // Public action handlers
@@ -183,21 +130,9 @@ class StickyAddToCartComponent extends Component {
       this.refs.addToCartButton.dataset.added = 'true';
     }
 
-    if (!cartIcon || !this.refs.addToCartButton || !this.refs.productImage) return;
     if (this.#resetTimeout) clearTimeout(this.#resetTimeout);
 
-    const flyToCartElement = /** @type {FlyToCart} */ (document.createElement('fly-to-cart'));
-    const sourceStyles = getComputedStyle(this.refs.productImage);
-
-    flyToCartElement.classList.add('fly-to-cart--sticky');
-    flyToCartElement.style.setProperty('background-image', `url(${this.refs.productImage.src})`);
-    flyToCartElement.useSourceSize = 'true';
-    flyToCartElement.source = this.refs.productImage;
-    flyToCartElement.destination = cartIcon;
-
-    document.body.appendChild(flyToCartElement);
-
-    await onAnimationEnd([this.refs.addToCartButton, flyToCartElement]);
+    await onAnimationEnd([this.refs.addToCartButton]);
     this.#resetTimeout = setTimeout(() => {
       this.refs.addToCartButton.removeAttribute('data-added');
     }, 800);
@@ -314,6 +249,21 @@ class StickyAddToCartComponent extends Component {
 
     this.#currentQuantity = event.detail.quantity;
     this.#updateButtonText();
+
+    // Sync all quantity inputs on the product page
+    const sectionElement = this.closest('.shopify-section');
+    if (sectionElement) {
+      const quantityInputs = sectionElement.querySelectorAll('quantity-selector-component input[name="quantity"]');
+      quantityInputs.forEach(input => {
+        if (parseInt(input.value) !== this.#currentQuantity) {
+          input.value = this.#currentQuantity;
+          const component = input.closest('quantity-selector-component');
+          if (component && typeof component.updateButtonStates === 'function') {
+            component.updateButtonStates();
+          }
+        }
+      });
+    }
   };
 
   /**

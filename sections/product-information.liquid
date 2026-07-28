@@ -92,77 +92,68 @@
           data-testid="sticky-product-title"
         >
           {{ product.title | escape }}
-        </p>
-        <div
-          class="sticky-add-to-cart__variant"
-          data-testid="sticky-variant-title"
-          {% if product.has_only_default_variant %}
-            style="display: none;"
-          {% endif %}
-        >
           {% unless product.has_only_default_variant %}
             {% if current_variant != blank %}
-              {% assign variant_title = current_variant.title | escape %}
+              <span class="sticky-add-to-cart__title-variant">- {{ current_variant.title | escape }}</span>
             {% endif %}
-            {{ variant_title }}
           {% endunless %}
+        </p>
+        <div class="sticky-add-to-cart__details-row">
+          <div
+            class="sticky-add-to-cart__price"
+            data-testid="sticky-price-display"
+          >
+            {% render 'price', product_resource: product, show_sale_price_first: true %}
+          </div>
         </div>
       </div>
 
-      <div
-        class="sticky-add-to-cart__price"
-        data-testid="sticky-price-display"
-      >
-        {% render 'price', product_resource: product, show_sale_price_first: true %}
-      </div>
+      <div class="sticky-add-to-cart__actions">
+        {% render 'quantity-selector', product: product, class: 'sticky-add-to-cart__quantity' %}
 
-      <button
-        type="button"
-        class="sticky-add-to-cart__button add-to-cart-button button"
-        ref="addToCartButton"
-        on:click="/handleAddToCartClick"
-        {% unless current_variant.available %}
-          disabled
-        {% endunless %}
-      >
-        <span
-          class="add-to-cart-text"
+        <button
+          type="button"
+          class="sticky-add-to-cart__button add-to-cart-button button"
+          ref="addToCartButton"
+          on:click="/handleAddToCartClick"
+          {% unless current_variant.available %}
+            disabled
+          {% endunless %}
         >
-          {% if current_variant.available %}
-            <span class="svg-wrapper">
-              {{- 'icon-add-to-cart.svg' | inline_asset_content -}}
-            </span>
-          {% endif %}
-          <span class="add-to-cart-text__content">
-            <span>
-              {%- if current_variant.available -%}
-                {{- 'products.product.add_to_cart' | t -}}
-              {%- elsif current_variant == blank -%}
-                {{- 'products.product.unavailable' | t -}}
-              {%- else -%}
-                {{- 'products.product.sold_out' | t -}}
-              {%- endif -%}
+          <span
+            class="add-to-cart-text"
+          >
+            {% if current_variant.available %}
+              <span class="svg-wrapper">
+                {{- 'icon-add-to-cart.svg' | inline_asset_content -}}
+              </span>
+            {% endif %}
+            <span class="add-to-cart-text__content">
+              <span>
+                {%- if current_variant.available -%}
+                  {{- 'products.product.add_to_cart' | t -}}
+                {%- elsif current_variant == blank -%}
+                  {{- 'products.product.unavailable' | t -}}
+                {%- else -%}
+                  {{- 'products.product.sold_out' | t -}}
+                {%- endif -%}
+              </span>
             </span>
             <span
               ref="quantityDisplay"
-              {% if current_variant.available and initial_quantity > 1 %}
-                style="display: inline;"
-              {% else %}
-                style="display: none;"
-              {% endif %}
+              style="display: none !important;"
+              class="visually-hidden"
             >
-              {{- ' (' -}}
               <span ref="quantityNumber">{{- initial_quantity -}}</span>
-              {{- ')' -}}
             </span>
           </span>
-        </span>
-        <span class="add-to-cart__added">
-          <span class="svg-wrapper add-to-cart__added-icon">
-            {{- 'icon-checkmark-burst.svg' | inline_asset_content -}}
+          <span class="add-to-cart__added">
+            <span class="svg-wrapper add-to-cart__added-icon">
+              {{- 'icon-checkmark-burst.svg' | inline_asset_content -}}
+            </span>
           </span>
-        </span>
-      </button>
+        </button>
+      </div>
     </div>
   </sticky-add-to-cart>
 {% endif %}
@@ -178,74 +169,69 @@
 
 <style>
 
+  html:has(theme-drawer[open]) .sticky-add-to-cart__bar {
+    display: none !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+
   .sticky-add-to-cart__bar {
     position: fixed;
-    bottom: 20px;
+    bottom: 24px;
     left: 50%;
-    opacity: 0;
-    transform: translateX(-50%) translateY(calc(100% + 40px));
-    z-index: calc(var(--layer-sticky) - 1); /* Below sticky header */
-    display: block;
-    width: 600px;
-    border-radius: calc(
-      var(--style-border-radius-buttons-primary) + min(var(--padding-sm), var(--style-border-radius-buttons-primary))
-    );
-    box-shadow: var(--shadow-popover);
-    padding: var(--padding-sm);
-    /* Layout styling */
-    display: flex;
+    transform: translateX(-50%) translateY(0) !important; /* Always visible */
+    opacity: 1 !important; /* Always visible */
+    z-index: 90; /* Keep it below header and cart drawer */
+    width: 720px !important; /* Wider horizontally */
+    max-width: 90%;
+    border-radius: 9999px !important; /* Fully rounded pill shape */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;
+    background: #ffffff !important;
+    border: 1px solid rgba(0, 0, 0, 0.06) !important;
+    padding: 6px 24px !important; /* Thinner vertically */
+    display: flex !important;
     align-items: center;
-    gap: var(--gap-md);
+    gap: 32px !important; /* Better horizontal space utilization */
+    transition: opacity 0.3s ease, transform 0.3s ease !important;
 
     @starting-style {
-      opacity: 0;
-      transform: translateX(-50%) translateY(calc(100% + 40px));
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
     }
 
     &::before {
-      --border: 2px;
-      content: '';
-      position: absolute;
-      inset: calc(var(--border) * -1);
-      background: linear-gradient(var(--color-background) 0 100%), linear-gradient(hsl(0 0% 0% / 0.15) 0 100%);
-      background-clip: content-box, border-box;
-      border: var(--border) solid #0000;
-      border-radius: inherit;
-      z-index: -1;
-      backdrop-filter: blur(20px) saturate(180%) brightness(1.5);
+      display: none !important; /* Remove the absolute positioning overlay */
     }
   }
 
   @media (prefers-reduced-motion: no-preference) {
     .sticky-add-to-cart__bar {
-      transition-property: transform, opacity, display;
-      transition-duration: 0.3s;
-      transition-timing-function: var(--ease-out-quad);
-      transition-behavior: allow-discrete;
+      transition: opacity 0.3s ease, transform 0.3s ease !important;
     }
   }
 
   .sticky-add-to-cart__bar[data-stuck='true'] {
-    transform: translateX(-50%) translateY(0%);
-    opacity: 1;
+    transform: translateX(-50%) translateY(0%) !important;
+    opacity: 1 !important;
   }
 
   sticky-add-to-cart:not([data-variant-available='true']) .sticky-add-to-cart__bar {
-    opacity: 0;
-    transform: translateX(-50%) translateY(calc(100% + 40px));
-    display: none;
+    opacity: 1 !important;
+    transform: translateX(-50%) translateY(0) !important;
+    display: flex !important; /* Keep it visible even if sold out, so the user knows it's sold out */
   }
 
   .sticky-add-to-cart__info[data-has-image='false'] {
-    padding-left: var(--padding-lg);
+    padding-left: 0;
   }
 
   .sticky-add-to-cart__image {
     flex-shrink: 0;
     aspect-ratio: 1;
-    height: var(--height-buy-buttons);
+    height: 48px !important;
+    width: 48px !important;
     overflow: hidden;
-    border-radius: var(--style-border-radius-buttons-primary);
+    border-radius: 9999px !important; /* Pill shape image circle! */
     background: var(--color-background-secondary);
   }
 
@@ -258,107 +244,260 @@
   .sticky-add-to-cart__info {
     flex: 1;
     min-width: 0; /* Allow text truncation */
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
   }
 
   .sticky-add-to-cart__title {
     font-size: var(--font-paragraph-medium--size);
-    font-weight: var(--font-weight-semibold);
-    line-height: var(--font-paragraph--line-height);
+    font-weight: 600;
+    line-height: normal;
     margin: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    color: #2e0808 !important;
   }
 
-  .sticky-add-to-cart__variant {
-    color: rgb(var(--color-foreground-rgb) / var(--opacity-subdued-text));
+  .sticky-add-to-cart__title-variant {
+    font-weight: normal;
     font-size: var(--font-paragraph-small--size);
-    margin-top: var(--margin-3xs);
+    color: #4a3a3a !important;
+    opacity: 0.8;
+  }
+
+  .sticky-add-to-cart__details-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .sticky-add-to-cart__badge {
+    background-color: #2e0808 !important;
+    color: #ffffff !important;
+    font-size: 11px !important;
+    font-weight: bold !important;
+    padding: 3px 8px !important;
+    border-radius: 6px !important;
+    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
   }
 
   .sticky-add-to-cart__price {
-    font-weight: var(--font-weight-semibold);
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .sticky-add-to-cart__price [ref="priceContainer"] {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    flex-wrap: nowrap !important;
+  }
+
+  .sticky-add-to-cart__price .product-card__badge--sale {
+    background-color: #2e0808 !important;
+    color: #ffffff !important;
+    font-size: 11px !important;
+    font-weight: bold !important;
+    padding: 3px 8px !important;
+    border-radius: 6px !important;
+    white-space: nowrap !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+  }
+
+  .sticky-add-to-cart__price .price-item--sale {
+    font-weight: bold !important;
+    color: #2e0808 !important;
+  }
+
+  .sticky-add-to-cart__price .price-item--regular {
+    color: #4a3a3a !important;
+    opacity: 0.6;
+    text-decoration: line-through;
+    margin-inline-start: 8px;
+  }
+
+  .sticky-add-to-cart__actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-shrink: 0;
+  }
+
+  .sticky-add-to-cart__actions .quantity-selector-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+
+  .sticky-add-to-cart__quantity {
+    --quantity-selector-width: 100px;
+    background-color: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    flex: 0 0 var(--quantity-selector-width) !important;
+    height: 44px !important;
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .sticky-add-to-cart__quantity :is(.quantity-minus, .quantity-plus) {
+    width: 28px !important;
+    height: 28px !important;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    background: transparent !important;
+    border: none !important;
+    cursor: pointer;
+    color: #2e0808 !important;
+    font-size: 18px !important;
+    font-weight: 300 !important;
+    opacity: 0.8;
+  }
+
+  .sticky-add-to-cart__quantity :is(.quantity-minus, .quantity-plus):hover {
+    opacity: 1;
+  }
+
+  .sticky-add-to-cart__quantity input[type='number'] {
+    width: 32px !important;
+    max-width: none !important; /* Prevent parent minimum-touch-target subtraction from hiding the number on mobile */
+    text-align: center !important;
+    border: none !important;
+    background: transparent !important;
+    font-size: 15px !important;
+    font-weight: 500 !important;
+    color: #2e0808 !important;
   }
 
   .sticky-add-to-cart__button {
-    height: var(--height-buy-buttons);
-    position: relative;
+    background-color: #2e0808 !important;
+    color: #ffffff !important;
+    border-radius: 9999px !important; /* Fully rounded */
+    padding: 12px 28px !important;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 10px !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    height: 44px !important;
+    border: none !important;
+    cursor: pointer !important;
+    box-shadow: 0 4px 12px rgba(46, 8, 8, 0.15) !important;
+    transition: all 0.2s ease !important;
+    white-space: nowrap !important;
+  }
+
+  .sticky-add-to-cart__button:hover {
+    background-color: #4a3a3a !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 16px rgba(46, 8, 8, 0.25) !important;
+  }
+
+  .sticky-add-to-cart__button:active {
+    transform: translateY(0) !important;
+  }
+
+  .sticky-add-to-cart__button .svg-wrapper {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    color: #ffffff !important;
+  }
+
+  .sticky-add-to-cart__button .svg-wrapper svg {
+    width: 100%;
+    height: 100%;
   }
 
   /* Mobile adjustments */
   @media screen and (max-width: 749px) {
     .sticky-add-to-cart__bar {
-      bottom: 0;
-      width: 100%;
-      max-width: none;
-      border-radius: 0;
-
-      &::before {
-        --border: 1px;
-      }
+      bottom: 68px !important; /* Stacked perfectly above the 56px mobile navigation bar */
+      width: auto !important;
+      max-width: 95% !important;
+      border-radius: 9999px !important;
+      padding: 6px 12px !important;
+      gap: 8px !important;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1) !important;
     }
 
-    .sticky-add-to-cart__bar .add-to-cart-text__content {
-      display: none;
+    .sticky-add-to-cart__image {
+      display: none !important;
     }
 
-    .sticky-add-to-cart__info[data-has-image='false'] {
-      padding-left: 0;
+    .sticky-add-to-cart__info {
+      display: none !important;
     }
 
-    .sticky-add-to-cart__title {
-      font-size: var(--font-paragraph--size);
+    .sticky-add-to-cart__actions {
+      gap: 8px !important;
+    }
+
+    .sticky-add-to-cart__quantity {
+      --quantity-selector-width: 80px;
+      height: 38px !important;
+    }
+
+    .sticky-add-to-cart__quantity :is(.quantity-minus, .quantity-plus) {
+      width: 24px !important;
+      height: 24px !important;
+      font-size: 16px !important;
+    }
+
+    .sticky-add-to-cart__quantity input[type='number'] {
+      width: 24px !important;
+      max-width: none !important; /* Prevent parent minimum-touch-target subtraction from hiding the number on mobile */
+      font-size: 14px !important;
     }
 
     .sticky-add-to-cart__button {
-      padding: var(--padding-lg);
+      height: 38px !important;
+      padding: 8px 16px !important;
+      font-size: 13px !important;
+      gap: 6px !important;
+      border-radius: 9999px !important;
     }
 
-    .sticky-add-to-cart__price {
-      font-size: var(--font-paragraph-small--size);
-    }
-
-    .sticky-add-to-cart__button {
-      width: var(--height-buy-buttons);
-    }
-
-    sticky-add-to-cart:not([data-variant-available='true']) .add-to-cart-text__content {
-      display: initial;
-    }
-
-    sticky-add-to-cart:not([data-variant-available='true']) .sticky-add-to-cart__button {
-      width: auto;
+    .sticky-add-to-cart__button .svg-wrapper {
+      width: 14px;
+      height: 14px;
     }
   }
 
-  /* Small mobile - hide text content and compare price */
+  /* Small mobile - hide title variant and tweak sizes */
   @media screen and (max-width: 389px) {
     .sticky-add-to-cart__bar {
-      .compare-at-price {
-        display: none;
-      }
+      gap: 8px !important;
+      padding: 6px 12px !important;
     }
 
-    .sticky-add-to-cart__title {
+    .sticky-add-to-cart__title-variant {
       display: none;
     }
 
-    /* For product with only default variant show title */
-    .sticky-add-to-cart__info[data-singleton='true'] .sticky-add-to-cart__title {
-      display: block;
+    .sticky-add-to-cart__title {
+      max-width: 80px;
     }
-
-    /* For single variant show title and variant, truncate both. variant should be identifiable with truncation */
-    .sticky-add-to-cart__info[data-single-option='true'] .sticky-add-to-cart__title {
-      display: block;
-    }
-
-    .sticky-add-to-cart__info[data-single-option='true'] .sticky-add-to-cart__variant {
-      display: block;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
+  }
   /* ── Product Page Luxury Details ──────────────── */
   .product-details,
   .product-details *,
