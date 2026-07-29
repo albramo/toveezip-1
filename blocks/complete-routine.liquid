@@ -1,6 +1,6 @@
 {%- liquid
   assign current_product = closest.product
-  assign limit_count = 6
+  assign limit_count = block.settings.limit_count | default: 6
   assign items_shown = 0
   
   # Accumulate products (prioritizing current product's collection, then filling with all products)
@@ -37,8 +37,10 @@
   endif
 -%}
 
+{%- assign total_available_items = 0 -%}
+
 <div class="complete-routine" {{ block.shopify_attributes }}>
-  <h3 class="complete-routine__title">Complete Your Routine</h3>
+  <h3 class="complete-routine__title">{{ block.settings.title | default: "Complete Your Routine" }}</h3>
   
   <div class="complete-routine__items">
     {%- assign handles_arr = show_products_handles | split: "," -%}
@@ -66,6 +68,7 @@
         if prod_variant.available
           assign can_add_to_cart = true
           assign add_to_cart_text = 'actions.add' | t
+          assign total_available_items = total_available_items | plus: 1
         endif
       -%}
       
@@ -131,10 +134,17 @@
       class="complete-routine__add-all-btn"
       data-routine-id="{{ block.id }}"
       onclick="completeRoutineAddAll(this)"
+      {% if total_available_items == 0 %}
+        disabled
+      {% endif %}
     >
-      <span class="complete-routine__add-all-text">🛒 Add All to Cart</span>
-      <span class="complete-routine__add-all-loading" style="display:none;">Adding...</span>
-      <span class="complete-routine__add-all-done" style="display:none;">✓ Added!</span>
+      <span class="complete-routine__add-all-text">
+        {% if total_available_items > 0 %}
+          {{ block.settings.add_all_text | default: "🛒 Add All to Cart" }}
+        {% else %}
+          {{ 'products.product.sold_out' | t | default: "Sold Out" }}
+        {% endif %}
+      </span>
     </button>
   </div>
 </div>
@@ -148,6 +158,10 @@ function completeRoutineAddAll(btn) {
   const forms = wrapper.querySelectorAll('form[data-type="add-to-cart-form"]');
   const items = [];
   forms.forEach(function(form) {
+    const submitBtn = form.querySelector('button[type="submit"]');
+    if (submitBtn && submitBtn.disabled) {
+      return; // Skip sold out/unavailable products
+    }
     const variantId = form.querySelector('input[name="id"]')?.value;
     const quantity = parseInt(form.querySelector('input[name="quantity"]')?.value || '1', 10);
     if (variantId) {
@@ -159,33 +173,24 @@ function completeRoutineAddAll(btn) {
 
   // Show loading
   btn.disabled = true;
-  btn.querySelector('.complete-routine__add-all-text').style.display = 'none';
-  btn.querySelector('.complete-routine__add-all-loading').style.display = 'inline';
-  btn.querySelector('.complete-routine__add-all-done').style.display = 'none';
+  btn.classList.add('is-loading');
 
   const formComponent = wrapper.querySelector('product-form-component');
   if (formComponent && typeof formComponent.processBatch === 'function') {
     formComponent.processBatch(items)
       .then(function() {
-        // Show success
-        btn.querySelector('.complete-routine__add-all-loading').style.display = 'none';
-        btn.querySelector('.complete-routine__add-all-done').style.display = 'inline';
-        // Reset button after 2.5s
+        btn.classList.remove('is-loading');
+        const originalText = btn.querySelector('.complete-routine__add-all-text').textContent;
+        btn.querySelector('.complete-routine__add-all-text').textContent = '✓ Added!';
         setTimeout(function() {
           btn.disabled = false;
-          btn.querySelector('.complete-routine__add-all-done').style.display = 'none';
-          btn.querySelector('.complete-routine__add-all-text').style.display = 'inline';
-        }, 2500);
+          btn.querySelector('.complete-routine__add-all-text').textContent = originalText;
+        }, 2000);
       })
       .catch(function(err) {
         console.error(err);
-        btn.querySelector('.complete-routine__add-all-loading').style.display = 'none';
-        btn.querySelector('.complete-routine__add-all-text').style.display = 'inline';
-        btn.querySelector('.complete-routine__add-all-text').textContent = '⚠ Try Again';
+        btn.classList.remove('is-loading');
         btn.disabled = false;
-        setTimeout(function() {
-          btn.querySelector('.complete-routine__add-all-text').textContent = '🛒 Add All to Cart';
-        }, 2500);
       });
   } else {
     // Fallback if component is not ready
@@ -199,9 +204,9 @@ function completeRoutineAddAll(btn) {
       return res.json();
     })
     .then(function() {
-      // Show success
-      btn.querySelector('.complete-routine__add-all-loading').style.display = 'none';
-      btn.querySelector('.complete-routine__add-all-done').style.display = 'inline';
+      btn.classList.remove('is-loading');
+      const originalText = btn.querySelector('.complete-routine__add-all-text').textContent;
+      btn.querySelector('.complete-routine__add-all-text').textContent = '✓ Added!';
       // Update cart bubble count
       fetch('/cart.js')
         .then(r => r.json())
@@ -209,21 +214,14 @@ function completeRoutineAddAll(btn) {
           document.querySelectorAll('[data-cart-count]').forEach(el => el.textContent = cart.item_count);
           document.dispatchEvent(new CustomEvent('cart:updated', { detail: { cart } }));
         });
-      // Reset button after 2.5s
       setTimeout(function() {
         btn.disabled = false;
-        btn.querySelector('.complete-routine__add-all-done').style.display = 'none';
-        btn.querySelector('.complete-routine__add-all-text').style.display = 'inline';
-      }, 2500);
+        btn.querySelector('.complete-routine__add-all-text').textContent = originalText;
+      }, 2000);
     })
     .catch(function() {
-      btn.querySelector('.complete-routine__add-all-loading').style.display = 'none';
-      btn.querySelector('.complete-routine__add-all-text').style.display = 'inline';
-      btn.querySelector('.complete-routine__add-all-text').textContent = '⚠ Try Again';
+      btn.classList.remove('is-loading');
       btn.disabled = false;
-      setTimeout(function() {
-        btn.querySelector('.complete-routine__add-all-text').textContent = '🛒 Add All to Cart';
-      }, 2500);
     });
   }
 }
@@ -588,6 +586,28 @@ function completeRoutineAddAll(btn) {
 {
   "name": "Complete Routine",
   "tag": null,
-  "settings": []
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Complete Your Routine"
+    },
+    {
+      "type": "text",
+      "id": "add_all_text",
+      "label": "Add All Button Text",
+      "default": "🛒 Add All to Cart"
+    },
+    {
+      "type": "range",
+      "id": "limit_count",
+      "label": "Max products to display",
+      "min": 2,
+      "max": 10,
+      "step": 1,
+      "default": 6
+    }
+  ]
 }
 {% endschema %}
