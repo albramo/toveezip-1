@@ -1,0 +1,299 @@
+{% liquid
+  assign current_id = product.id | default: 0
+  assign limit_count = 12
+
+  # Accumulate products
+  assign show_products_handles = ""
+  for prod in collections.all.products
+    if prod.id != current_id
+      assign show_products_handles = show_products_handles | append: prod.handle | append: ","
+    endif
+  endfor
+  assign handles_arr = show_products_handles | split: ","
+%}
+
+{%- if handles_arr.size > 0 -%}
+  <div class="related-products-slider-section" id="RelatedProductsSlider-{{ section.id }}">
+    <div class="container mx-auto px-4">
+      <h3 class="related-products-slider__title">{{ section.settings.title | default: "You May Also Like" }}</h3>
+
+      <!-- DESKTOP SLIDER (4 products per slide) -->
+      <div class="related-products-desktop">
+        <div class="related-products__track" id="RelatedProductsDesktop-{{ section.id }}">
+          {%- assign desktop_items_shown = 0 -%}
+          {%- for handle in handles_arr limit: limit_count -%}
+            {%- if handle == blank -%}{%- continue -%}{%- endif -%}
+            {%- assign prod = all_products[handle] -%}
+            {%- if prod == blank -%}{%- continue -%}{%- endif -%}
+
+            {%- assign modulo = desktop_items_shown | modulo: 4 -%}
+            {%- if modulo == 0 -%}
+              <div class="related-products__slide{% if desktop_items_shown == 0 %} is-active{% endif %}" data-slide-index="{{ desktop_items_shown | divided_by: 4 }}">
+                <div class="related-products__grid-desktop">
+            {%- endif -%}
+
+                  <div class="related-products__item">
+                    {% render 'product-card', product: prod, block: section %}
+                  </div>
+
+            {%- assign desktop_items_shown = desktop_items_shown | plus: 1 -%}
+            {%- assign modulo_next = desktop_items_shown | modulo: 4 -%}
+            {%- if modulo_next == 0 or forloop.last -%}
+                </div>
+              </div>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+
+        <!-- Dots for Desktop -->
+        {%- assign desktop_slides_count = desktop_items_shown | plus: 3 | divided_by: 4 -%}
+        {%- if desktop_slides_count > 1 -%}
+          <div class="related-products__dots">
+            {%- for i in (1..desktop_slides_count) -%}
+              <button type="button" class="related-products__dot{% if forloop.first %} is-active{% endif %}" data-slide-index="{{ forloop.index0 }}"></button>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+      </div>
+
+      <!-- MOBILE SLIDER (2 products per slide) -->
+      <div class="related-products-mobile">
+        <div class="related-products__track" id="RelatedProductsMobile-{{ section.id }}">
+          {%- assign mobile_items_shown = 0 -%}
+          {%- for handle in handles_arr limit: limit_count -%}
+            {%- if handle == blank -%}{%- continue -%}{%- endif -%}
+            {%- assign prod = all_products[handle] -%}
+            {%- if prod == blank -%}{%- continue -%}{%- endif -%}
+
+            {%- assign modulo = mobile_items_shown | modulo: 2 -%}
+            {%- if modulo == 0 -%}
+              <div class="related-products__slide{% if mobile_items_shown == 0 %} is-active{% endif %}" data-slide-index="{{ mobile_items_shown | divided_by: 2 }}">
+                <div class="related-products__grid-mobile">
+            {%- endif -%}
+
+                  <div class="related-products__item">
+                    {% render 'product-card', product: prod, block: section %}
+                  </div>
+
+            {%- assign mobile_items_shown = mobile_items_shown | plus: 1 -%}
+            {%- assign modulo_next = mobile_items_shown | modulo: 2 -%}
+            {%- if modulo_next == 0 or forloop.last -%}
+                </div>
+              </div>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+
+        <!-- Dots for Mobile -->
+        {%- assign mobile_slides_count = mobile_items_shown | plus: 1 | divided_by: 2 -%}
+        {%- if mobile_slides_count > 1 -%}
+          <div class="related-products__dots">
+            {%- for i in (1..mobile_slides_count) -%}
+              <button type="button" class="related-products__dot{% if forloop.first %} is-active{% endif %}" data-slide-index="{{ forloop.index0 }}"></button>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+      </div>
+
+    </div>
+  </div>
+
+  <style>
+    .related-products-slider-section {
+      padding-block: 48px;
+      background: var(--color-background, #ffffff);
+      color: var(--color-foreground, #000000);
+      overflow: hidden;
+      width: 100%;
+    }
+
+    .related-products-slider__title {
+      font-family: var(--font-heading--family);
+      font-size: clamp(24px, 3.5vw, 32px);
+      font-weight: 700;
+      text-align: center;
+      margin-top: 0;
+      margin-bottom: 32px;
+      color: var(--color-foreground, #000000);
+      letter-spacing: -0.02em;
+    }
+
+    .related-products-desktop {
+      display: block;
+      width: 100%;
+      max-width: var(--page-width, 1400px);
+      margin-inline: auto;
+    }
+
+    .related-products-mobile {
+      display: none;
+      width: 100%;
+    }
+
+    @media screen and (max-width: 749px) {
+      .related-products-desktop {
+        display: none;
+      }
+      .related-products-mobile {
+        display: block;
+      }
+    }
+
+    .related-products__track {
+      position: relative;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr;
+    }
+
+    .related-products__slide {
+      grid-area: 1 / 1 / 2 / 2;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94), visibility 0.6s;
+      z-index: 1;
+      width: 100%;
+      pointer-events: none;
+    }
+
+    .related-products__slide.is-active {
+      opacity: 1;
+      visibility: visible;
+      z-index: 2;
+      pointer-events: auto;
+    }
+
+    .related-products__grid-desktop {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      width: 100%;
+    }
+
+    .related-products__grid-mobile {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      width: 100%;
+    }
+
+    .related-products__item {
+      width: 100%;
+      min-width: 0;
+    }
+
+    .related-products__dots {
+      margin-top: 24px;
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .related-products__dot {
+      width: 8px;
+      height: 8px;
+      border: none;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.15);
+      padding: 0;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .related-products__dot.is-active {
+      width: 24px;
+      border-radius: 4px;
+      background: var(--color-foreground, #000000);
+    }
+  </style>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      initAllRelatedSliders();
+    });
+
+    document.addEventListener('shopify:section:load', function (event) {
+      if (event.detail.sectionId === '{{ section.id }}') {
+        initAllRelatedSliders();
+      }
+    });
+
+    function initAllRelatedSliders() {
+      initRelatedProductsSlider('RelatedProductsDesktop-{{ section.id }}');
+      initRelatedProductsSlider('RelatedProductsMobile-{{ section.id }}');
+    }
+
+    function initRelatedProductsSlider(sliderId) {
+      const container = document.getElementById(sliderId);
+      if (!container) return;
+
+      const slides = [...container.querySelectorAll('.related-products__slide')];
+      const parentClass = sliderId.includes('Desktop') ? '.related-products-desktop' : '.related-products-mobile';
+      const dots = [...container.closest(parentClass).querySelectorAll('.related-products__dot')];
+
+      if (slides.length <= 1) return;
+
+      let currentIndex = 0;
+      let intervalId = null;
+
+      function goToSlide(index) {
+        slides[currentIndex].classList.remove('is-active');
+        if (dots.length) dots[currentIndex].classList.remove('is-active');
+
+        currentIndex = (index + slides.length) % slides.length;
+
+        slides[currentIndex].classList.add('is-active');
+        if (dots.length) {
+          dots[currentIndex].classList.add('is-active');
+        }
+      }
+
+      function startAutoplay() {
+        stopAutoplay();
+        intervalId = setInterval(() => {
+          goToSlide(currentIndex + 1);
+        }, 3000); // 3 seconds interval
+      }
+
+      function stopAutoplay() {
+        if (intervalId) {
+          clearInterval(intervalId);
+          intervalId = null;
+        }
+      }
+
+      startAutoplay();
+
+      container.addEventListener('mouseenter', stopAutoplay);
+      container.addEventListener('mouseleave', startAutoplay);
+
+      dots.forEach((dot, index) => {
+        dot.addEventListener('click', () => {
+          goToSlide(index);
+          startAutoplay();
+        });
+      });
+    }
+  </script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Related Products Slider",
+  "tag": "section",
+  "class": "related-products-slider-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "You May Also Like"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Related Products Slider"
+    }
+  ]
+}
+{% endschema %}

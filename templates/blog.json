@@ -16,10 +16,17 @@
         "padding-block-end": 48,
         "posts_per_page": 9
       }
+    },
+    "recommendations": {
+      "type": "related-products-slider",
+      "settings": {
+        "title": "You May Also Like"
+      }
     }
   },
   "order": [
     "slider",
-    "main"
+    "main",
+    "recommendations"
   ]
 }
