@@ -430,11 +430,7 @@
             },
             "complete_routine_custom": {
               "type": "complete-routine",
-              "settings": {
-                "title": "Complete Your Routine",
-                "add_all_text": "Add All to Cart",
-                "limit_count": 6
-              },
+              "settings": {},
               "blocks": {}
             },
             "text_aEtTtq": {

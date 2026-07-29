@@ -33,7 +33,7 @@
             {%- endif -%}
 
                   <div class="related-products__item">
-                    {% render 'product-card', product: prod, block: section %}
+                    {% render 'product-card', product: prod, block: section, product_view_context: 'recommendation' %}
                   </div>
 
             {%- assign desktop_items_shown = desktop_items_shown | plus: 1 -%}
@@ -72,7 +72,7 @@
             {%- endif -%}
 
                   <div class="related-products__item">
-                    {% render 'product-card', product: prod, block: section %}
+                    {% render 'product-card', product: prod, block: section, product_view_context: 'recommendation' %}
                   </div>
 
             {%- assign mobile_items_shown = mobile_items_shown | plus: 1 -%}
