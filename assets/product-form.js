@@ -488,11 +488,7 @@ class ProductFormComponent extends Component {
             btn.classList.remove('is-loading');
           }
 
-          // Automatically open the cart drawer!
-          setTimeout(() => {
-            const drawer = document.querySelector('theme-drawer#cart-drawer');
-            if (drawer?.open) drawer.open();
-          }, 80);
+          // Automatically open the cart drawer is handled by cart-drawer.js promise listener
 
           // Add aria-live region to inform screen readers that the item was added
           // Get the added text from any add-to-cart button
@@ -678,11 +674,7 @@ class ProductFormComponent extends Component {
           btn.classList.remove('is-loading');
         }
 
-        // Automatically open the cart drawer!
-        setTimeout(() => {
-          const drawer = document.querySelector('theme-drawer#cart-drawer');
-          if (drawer?.open) drawer.open();
-        }, 80);
+        // Automatically open the cart drawer is handled by cart-drawer.js promise listener
 
         const allAddToCartContainers = /** @type {NodeListOf<AddToCartComponent>} */ (
           this.querySelectorAll('add-to-cart-component')

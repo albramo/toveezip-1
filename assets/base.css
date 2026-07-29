@@ -4023,18 +4023,40 @@ button.is-loading *,
   visibility: hidden !important;
 }
 
+button.is-loading::before,
+.button.is-loading::before,
+[data-loading="true"]::before {
+  content: "تحميل..." !important;
+  position: absolute !important;
+  top: 50% !important;
+  left: calc(50% + 14px) !important;
+  transform: translate(-50%, -50%) !important;
+  font-size: 14px !important;
+  font-family: inherit !important;
+  font-weight: 600 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  z-index: 11 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  pointer-events: none !important;
+  white-space: nowrap !important;
+  color: #ffffff !important;
+}
+
 button.is-loading::after,
 .button.is-loading::after,
 [data-loading="true"]::after {
   content: "" !important;
   position: absolute !important;
   top: 50% !important;
-  left: 50% !important;
-  width: 18px !important;
-  height: 18px !important;
-  margin-top: -9px !important;
-  margin-left: -9px !important;
-  border: 2px solid #111111 !important; /* fallback dark */
+  left: calc(50% - 35px) !important;
+  width: 16px !important;
+  height: 16px !important;
+  margin-top: -8px !important;
+  margin-left: -8px !important;
+  border: 2px solid #ffffff !important;
   border-top-color: transparent !important;
   border-radius: 50% !important;
   animation: spin-loader 0.6s linear infinite !important;
@@ -4043,19 +4065,39 @@ button.is-loading::after,
   z-index: 10 !important;
 }
 
-/* For dark buttons with white text, ensure spinner is white */
-button.button-primary.is-loading::after,
-button.product-card__buy-btn.is-loading::after,
-button.sticky-add-to-cart__button.is-loading::after,
-[ref="addToCartButton"].is-loading::after {
-  border-color: #ffffff !important;
+/* For light backgrounds, fall back to dark loading states */
+button.is-loading:not(.button-primary):not(.product-card__buy-btn):not(.sticky-add-to-cart__button):not([ref="addToCartButton"])::before {
+  color: #111111 !important;
+}
+button.is-loading:not(.button-primary):not(.product-card__buy-btn):not(.sticky-add-to-cart__button):not([ref="addToCartButton"])::after {
+  border-color: #111111 !important;
   border-top-color: transparent !important;
 }
 
-/* For translucent recommendations, ensure spinner is dark */
+/* For translucent recommendations, ensure spinner and text are dark */
+button.rec-add-to-cart-btn.is-loading::before {
+  color: #111111 !important;
+  font-size: 11px !important;
+  left: calc(50% + 8px) !important;
+}
 button.rec-add-to-cart-btn.is-loading::after {
   border-color: #111111 !important;
   border-top-color: transparent !important;
+  left: calc(50% - 28px) !important;
+  width: 12px !important;
+  height: 12px !important;
+  margin-top: -6px !important;
+  margin-left: -6px !important;
+}
+
+/* Ensure circular mobile buttons hide text and center spinner */
+@media screen and (max-width: 749px) {
+  button.product-card__buy-btn.is-loading::before {
+    display: none !important;
+  }
+  button.product-card__buy-btn.is-loading::after {
+    left: 50% !important;
+  }
 }
 
 @keyframes spin-loader {
