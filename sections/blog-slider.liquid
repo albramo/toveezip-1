@@ -8,9 +8,10 @@
     assign slide_count = total_articles | plus: 2 | divided_by: 3
   -%}
 
+  <!-- DESKTOP SLIDER (3 Articles per slide) -->
   <div
-    id="BlogSlider-{{ section.id }}"
-    class="blog-slider-section"
+    id="BlogSliderDesktop-{{ section.id }}"
+    class="blog-slider-section blog-slider-desktop"
     data-autoplay="{{ section.settings.autoplay }}"
     data-autoplay-speed="{{ section.settings.autoplay_speed | times: 1000 | default: 5000 }}"
   >
@@ -100,7 +101,91 @@
     </div>
   </div>
 
+
+  <!-- MOBILE SLIDER (1 Article per slide) -->
+  <div
+    id="BlogSliderMobile-{{ section.id }}"
+    class="blog-slider-section blog-slider-mobile"
+    data-autoplay="{{ section.settings.autoplay }}"
+    data-autoplay-speed="{{ section.settings.autoplay_speed | times: 1000 | default: 5000 }}"
+  >
+    <div class="blog-slider__container container mx-auto px-4">
+      <div class="blog-slider__track">
+        {%- for article in blog.articles limit: limit -%}
+          <div
+            class="blog-slider__slide{% if forloop.first %} is-active{% endif %}"
+            data-slide-index="{{ forloop.index0 }}"
+          >
+            <a href="{{ article.url }}" class="blog-slider__card-link">
+              <div class="blog-slider__card">
+                <div class="blog-slider__image-wrapper">
+                  {%- if article.image -%}
+                    {{
+                      article.image
+                      | image_url: width: 800
+                      | image_tag:
+                        loading: 'lazy',
+                        class: 'blog-slider__image',
+                        widths: '400, 600, 800'
+                    }}
+                  {%- else -%}
+                    {{ 'lifestyle-1' | placeholder_svg_tag: 'blog-slider__image placeholder-svg' }}
+                  {%- endif -%}
+                </div>
+                <div class="blog-slider__card-content">
+                  <span class="blog-slider__tag">
+                    {%- if article.tags.size > 0 -%}
+                      in {{ article.tags.first }}
+                    {%- else -%}
+                      in {{ blog.title }}
+                    {%- endif -%}
+                  </span>
+                  <h3 class="blog-slider__title">
+                    {{ article.title }}
+                  </h3>
+                </div>
+              </div>
+            </a>
+          </div>
+        {%- endfor -%}
+      </div>
+
+      {%- if total_articles > 1 -%}
+        <div class="blog-slider__dots" role="tablist" aria-label="Slider Pagination">
+          {%- for i in (1..total_articles) -%}
+            <button
+              role="tab"
+              class="blog-slider__dot{% if forloop.first %} is-active{% endif %}"
+              data-slide-index="{{ forloop.index0 }}"
+              aria-label="Go to slide {{ forloop.index }}"
+              aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
+              type="button"
+            ></button>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+
+
   <style>
+    /* Responsive Display of Desktop vs Mobile Slider */
+    .blog-slider-desktop {
+      display: block;
+    }
+    .blog-slider-mobile {
+      display: none;
+    }
+
+    @media screen and (max-width: 749px) {
+      .blog-slider-desktop {
+        display: none;
+      }
+      .blog-slider-mobile {
+        display: block;
+      }
+    }
+
     .blog-slider-section {
       position: relative;
       width: 100%;
@@ -150,20 +235,6 @@
       .blog-slider__slide-grid {
         grid-template-columns: repeat(2, 1fr);
         gap: 16px;
-      }
-      /* Hide the 3rd card on tablets to maintain grid balance */
-      .blog-slider__slide-grid .blog-slider__card-link:nth-child(3) {
-        display: none;
-      }
-    }
-
-    @media screen and (max-width: 749px) {
-      .blog-slider__slide-grid {
-        grid-template-columns: 1fr;
-      }
-      /* Only show 1 card per slide on mobile for maximum readability */
-      .blog-slider__slide-grid .blog-slider__card-link:nth-child(2) {
-        display: none;
       }
     }
 
@@ -346,18 +417,23 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-      initBlogSlider();
+      initAllBlogSliders();
     });
 
     // Theme Customizer live preview support
     document.addEventListener('shopify:section:load', function (event) {
       if (event.detail.sectionId === '{{ section.id }}') {
-        initBlogSlider();
+        initAllBlogSliders();
       }
     });
 
-    function initBlogSlider() {
-      const slider = document.getElementById('BlogSlider-{{ section.id }}');
+    function initAllBlogSliders() {
+      initBlogSlider('BlogSliderDesktop-{{ section.id }}');
+      initBlogSlider('BlogSliderMobile-{{ section.id }}');
+    }
+
+    function initBlogSlider(sliderId) {
+      const slider = document.getElementById(sliderId);
       if (!slider) return;
 
       const slides = [...slider.querySelectorAll('.blog-slider__slide')];
