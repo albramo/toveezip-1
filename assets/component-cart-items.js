@@ -176,6 +176,12 @@ export class CartItemsComponent extends createViewEventElement(Component) {
     if (isEmptyCart && template instanceof HTMLTemplateElement) {
       const clone = document.importNode(template.content, true);
 
+      // Close the cart drawer immediately to prevent visual glitching
+      const drawer = document.querySelector('theme-drawer#cart-drawer');
+      if (drawer && typeof drawer.close === 'function') {
+        drawer.close();
+      }
+
       startViewTransition(() => {
         document.getElementById('cart-drawer-heading')?.remove();
         this.replaceChildren(clone);
