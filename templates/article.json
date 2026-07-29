@@ -36,10 +36,17 @@
       "settings": {
         "heading": "RELATED ARTICLES"
       }
+    },
+    "recommendations": {
+      "type": "related-products-slider",
+      "settings": {
+        "title": "You May Also Like"
+      }
     }
   },
   "order": [
     "section",
-    "related-articles"
+    "related-articles",
+    "recommendations"
   ]
 }
