@@ -4340,6 +4340,7 @@
   },
   "products": {
     "product": {
+      "save": "وفر",
       "add_to_cart": "أضف إلى عربة التسوق",
       "adding_to_cart": "جارٍ الإضافة...",
       "added_to_cart": "أضيف إلى سلة التسوق",

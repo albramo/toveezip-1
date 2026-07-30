@@ -3,7 +3,7 @@
   assign product_resource = closest.product | default: product
   assign current_variant = product_resource.selected_or_first_available_variant
 
-  # Fetch the dynamic percentage discount from product metafield or block settings fallback
+  # Fetch the dynamic percentage discount from product metafield or block settings fallback as requested by user
   assign discount_percent = nil
   if product_resource.metafields.custom.pack_discount.value != blank
     assign discount_percent = product_resource.metafields.custom.pack_discount.value
@@ -117,7 +117,8 @@
       >
         <!-- Save Badge -->
         <div class="pack-save-badge">
-          {{ 'products.product.save' | t | default: 'SAVE' }} {{ discount_percent }}%
+          {% assign save_text = 'products.product.save' | t | default: 'Save' %}
+          {{ save_text }} {{ discount_percent }}%
         </div>
         <div class="pack-card-inner">
           <div class="pack-image-wrapper pack-image-double">

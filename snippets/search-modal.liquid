@@ -52,11 +52,25 @@
         class="predictive-search-form"
         ref="form"
         on:keydown="/onSearchKeyDown"
+        on:submit="/onSearchFormSubmit"
       >
         <div
           class="predictive-search-form__header"
         >
           <div class="predictive-search-form__header-inner">
+            <select
+              class="search-category-select"
+              aria-label="Category"
+              ref="categorySelect"
+              on:change="/onCategoryChange"
+            >
+              <option value="">
+                {%- if request.locale.iso_code == 'ar' -%}جميع الفئات{%- else -%}All Categories{%- endif -%}
+              </option>
+              {%- for collection in collections -%}
+                <option value="{{ collection.handle }}">{{ collection.title }}</option>
+              {%- endfor -%}
+            </select>
             <label
               for="{{ 'cmdk-input' | default: 'Search' }}"
               class="visually-hidden"
@@ -139,6 +153,49 @@
 </dialog-component>
 
 {% stylesheet %}
+  .search-category-select {
+    width: 140px;
+    min-width: 140px;
+    border: none;
+    background: transparent;
+    font-size: var(--font-size--md);
+    color: var(--color-foreground);
+    padding-inline: var(--padding-md);
+    height: var(--minimum-touch-target);
+    cursor: pointer;
+    border-inline-end: 1px solid var(--color-border);
+    outline: none;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  @media screen and (max-width: 749px) {
+    .search-category-select {
+      width: 100px;
+      min-width: 100px;
+      font-size: 12px;
+      padding-inline: var(--padding-xs);
+    }
+  }
+
+  .predictive-search-form__header-inner:has(.search-category-select) .predictive-search__icon {
+    left: calc(100px + var(--margin-xl));
+  }
+  @media screen and (min-width: 750px) {
+    .predictive-search-form__header-inner:has(.search-category-select) .predictive-search__icon {
+      left: calc(140px + var(--margin-md));
+    }
+  }
+
+  .predictive-search-form__header-inner:has(.search-category-select) input.search-input {
+    padding-inline-start: calc(100px + var(--margin-lg) + var(--icon-size-lg));
+  }
+  @media screen and (min-width: 750px) {
+    .predictive-search-form__header-inner:has(.search-category-select) input.search-input {
+      padding-inline-start: calc(140px + var(--margin-lg) + var(--icon-size-lg));
+    }
+  }
+
   /* Search modal style */
   .search-modal {
     --search-border-radius: var(--style-border-radius-popover);

@@ -112,8 +112,35 @@ class StickyAddToCartComponent extends Component {
     if (productForm) {
       this.#targetAddToCartButton = productForm.querySelector('[ref="addToCartButton"]');
     }
-    // Always show the sticky bar permanently!
-    this.#showStickyBar();
+
+    this.#buyButtonsIntersectionObserver?.disconnect();
+
+    if (this.#targetAddToCartButton) {
+      this.#buyButtonsIntersectionObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            this.#hideStickyBar();
+          } else {
+            // Check if the button is scrolled past (above the viewport)
+            if (entry.boundingClientRect.bottom < 0) {
+              if (!this.#isChatActive()) {
+                this.#showStickyBar();
+              } else {
+                this.#hideStickyBar();
+              }
+            } else {
+              this.#hideStickyBar();
+            }
+          }
+        });
+      }, {
+        root: null,
+        threshold: 0
+      });
+      this.#buyButtonsIntersectionObserver.observe(this.#targetAddToCartButton);
+    } else {
+      this.#hideStickyBar();
+    }
   }
 
   // Public action handlers
@@ -194,6 +221,9 @@ class StickyAddToCartComponent extends Component {
         }
         // Restore the current quantity display if needed
         this.#updateButtonText();
+
+        // Re-initialize intersection observer for the new variant button
+        this.#setupIntersectionObserver();
       })
       .catch((error) => {
         if (error?.name !== 'AbortError') console.warn('[sticky-add-to-cart] Event promise rejected:', error);
