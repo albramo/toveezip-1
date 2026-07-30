@@ -33,12 +33,12 @@
   # Logic to determine which variant URL to use (matching swatch selection logic)
   assign variant_to_link = product.selected_or_first_available_variant
 
-  if settings.transition_to_main_product
-    assign featured_image = variant_to_link.featured_image
-    if featured_image == blank
-      assign featured_image = product.featured_media.preview_image
-    endif
+  assign featured_image = variant_to_link.featured_image
+  if featured_image == blank
+    assign featured_image = product.featured_media.preview_image
+  endif
 
+  if settings.transition_to_main_product
     if featured_image != blank
       assign featured_media_url = featured_image | image_url: width: 500
     endif
@@ -97,10 +97,21 @@
               | image_url: width: 800
               | image_tag:
                 loading: 'lazy',
-                class: 'product-card__image',
+                class: 'product-card__image product-card__image--primary',
                 sizes: '(min-width: 990px) 33vw, (min-width: 750px) 50vw, 100vw',
                 widths: '375, 550, 750, 1100, 1500'
             }}
+            {%- if product.media[1] != blank and settings.show_second_image_on_hover -%}
+              {{
+                product.media[1].preview_image
+                | image_url: width: 800
+                | image_tag:
+                  loading: 'lazy',
+                  class: 'product-card__image product-card__image--secondary',
+                  sizes: '(min-width: 990px) 33vw, (min-width: 750px) 50vw, 100vw',
+                  widths: '375, 550, 750, 1100, 1500'
+              }}
+            {%- endif -%}
           {%- else -%}
             {{ 'lifestyle-2' | placeholder_svg_tag: 'product-card__image placeholder-svg' }}
           {%- endif -%}
@@ -236,6 +247,30 @@
       height: 100% !important;
       object-fit: cover !important;
       display: block !important;
+      transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease !important;
+    }
+
+    .rec-card .product-card__image--primary {
+      opacity: 1 !important;
+      z-index: 2 !important;
+    }
+
+    .rec-card .product-card__image--secondary {
+      opacity: 0 !important;
+      z-index: 1 !important;
+    }
+
+    @media (hover: hover) {
+      .rec-card:hover .rec-media img {
+        transform: scale(1.06) !important;
+      }
+      .rec-card:has(.product-card__image--secondary):hover .product-card__image--primary {
+        opacity: 0 !important;
+      }
+      .rec-card:hover .product-card__image--secondary {
+        opacity: 1 !important;
+        z-index: 3 !important;
+      }
     }
 
     /* Discount badge */
