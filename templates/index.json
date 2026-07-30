@@ -60,6 +60,51 @@
         "image_behavior": "full"
       }
     },
+    "tovee_trust_badges": {
+      "type": "tovee-trust-badges",
+      "blocks": {
+        "badge_1": {
+          "type": "badge",
+          "settings": {
+            "image": "shopify://shop_images/tovee-_-_-_-made-in-egypt-icon.webp",
+            "icon": "location",
+            "title": "Made in Egypt",
+            "text": "PROUDLY MADE LOCALLY"
+          }
+        },
+        "badge_2": {
+          "type": "badge",
+          "settings": {
+            "image": "shopify://shop_images/tovee-science-driven-formulas-icon.webp-ezgif.com-resize_82baa2c0-75e6-4a07-a99c-e781aa9f56c2.webp",
+            "icon": "beaker",
+            "title": "Science-Driven Formulas",
+            "text": "BACKED BY RESEARCH"
+          }
+        },
+        "badge_3": {
+          "type": "badge",
+          "settings": {
+            "image": "shopify://shop_images/tovee-_-_-_-carefully-selected-ingredients-icon.webp",
+            "icon": "leaf",
+            "title": "Pure Ingredients",
+            "text": "FOR HEALTHY, BALANCED SKIN"
+          }
+        }
+      },
+      "block_order": [
+        "badge_1",
+        "badge_2",
+        "badge_3"
+      ],
+      "settings": {
+        "background_color": "#faf8f6",
+        "text_color": "#2e0808",
+        "muted_color": "#6d2a2a",
+        "accent_color": "#6d2a2a",
+        "padding_top": 24,
+        "padding_bottom": 24
+      }
+    },
     "product_list_fa6P9H": {
       "type": "product-list",
       "blocks": {
@@ -214,9 +259,9 @@
                 "show_sale_price_first": true,
                 "show_installments": false,
                 "show_tax_info": false,
-                "type_preset": "custom",
+                "type_preset": "",
                 "width": "100%",
-                "alignment": "left",
+                "alignment": "center",
                 "font": "var(--font-body--family)",
                 "font_size": "0.875rem",
                 "line_height": "normal",
@@ -405,51 +450,6 @@
         "border_radius": 0,
         "padding-block-start": 0,
         "padding-block-end": 0
-      }
-    },
-    "tovee_trust_badges": {
-      "type": "tovee-trust-badges",
-      "blocks": {
-        "badge_1": {
-          "type": "badge",
-          "settings": {
-            "image": "shopify:\/\/shop_images\/tovee-_-_-_-made-in-egypt-icon.webp",
-            "icon": "location",
-            "title": "Made in Egypt",
-            "text": "PROUDLY MADE LOCALLY"
-          }
-        },
-        "badge_2": {
-          "type": "badge",
-          "settings": {
-            "image": "shopify:\/\/shop_images\/tovee-science-driven-formulas-icon.webp-ezgif.com-resize_82baa2c0-75e6-4a07-a99c-e781aa9f56c2.webp",
-            "icon": "beaker",
-            "title": "Science-Driven Formulas",
-            "text": "BACKED BY RESEARCH"
-          }
-        },
-        "badge_3": {
-          "type": "badge",
-          "settings": {
-            "image": "shopify:\/\/shop_images\/tovee-_-_-_-carefully-selected-ingredients-icon.webp",
-            "icon": "leaf",
-            "title": "Pure Ingredients",
-            "text": "FOR HEALTHY, BALANCED SKIN"
-          }
-        }
-      },
-      "block_order": [
-        "badge_1",
-        "badge_2",
-        "badge_3"
-      ],
-      "settings": {
-        "background_color": "#FAF8F6",
-        "text_color": "#2e0808",
-        "muted_color": "#6d2a2a",
-        "accent_color": "#6d2a2a",
-        "padding_top": 24,
-        "padding_bottom": 24
       }
     }
   },
