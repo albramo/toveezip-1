@@ -220,8 +220,22 @@
     }
 
     .rec-media {
-      overflow: hidden;
-      border-radius: 16px 16px 0 0;
+      position: relative !important;
+      overflow: hidden !important;
+      aspect-ratio: 1 !important;
+      border-radius: 16px 16px 0 0 !important;
+      width: 100% !important;
+      height: auto !important;
+      display: block !important;
+    }
+
+    .rec-media img {
+      position: absolute !important;
+      inset: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: cover !important;
+      display: block !important;
     }
 
     /* Discount badge */
