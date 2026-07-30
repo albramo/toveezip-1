@@ -167,12 +167,52 @@ export class ProductCard extends ProductCardLink {
 
     this.addEventListener('click', this.navigateToProduct);
 
+    this.moveCustomBlocksToInfo();
+
     // Preload the next image on the slideshow to avoid white flashes on previewImage
     setTimeout(() => {
       if (this.refs.slideshow?.isNested) {
         this.#preloadNextPreviewImage();
       }
     });
+  }
+
+  /**
+   * Move any customized blocks (e.g. custom title, price, reviews, swatches) from the gallery to the info section
+   * so they are correctly visible and style-customizable inside the Shopify Theme Editor.
+   */
+  moveCustomBlocksToInfo() {
+    const gallery = this.querySelector('.product-card__gallery');
+    const info = this.querySelector('.product-card__info');
+    if (!gallery || !info) return;
+
+    // Filter elements in gallery that are customized sub-blocks
+    const elementsToMove = [...gallery.children].filter(el => {
+      if (el.classList.contains('product-card__discount-badge')) return false;
+      if (el.classList.contains('product-card__quick-view-btn')) return false;
+      if (el.classList.contains('std-quick-view-btn')) return false;
+      if (el.tagName.toLowerCase() === 'quick-view-modal') return false;
+      if (el.classList.contains('card-gallery') || el.tagName.toLowerCase() === 'card-gallery' || el.getAttribute('ref') === 'cardGalleryLink') return false;
+      if (el.classList.contains('quick-add__button')) return false;
+      return true;
+    });
+
+    if (elementsToMove.length > 0) {
+      const actions = info.querySelector('.product-card__actions');
+      elementsToMove.forEach(el => {
+        if (actions) {
+          info.insertBefore(el, actions);
+        } else {
+          info.appendChild(el);
+        }
+      });
+
+      // Hide the fallback static/hardcoded title and price
+      const fallbackTitle = info.querySelector('.fallback-title');
+      const fallbackPrice = info.querySelector('.fallback-price');
+      if (fallbackTitle) fallbackTitle.style.display = 'none';
+      if (fallbackPrice) fallbackPrice.style.display = 'none';
+    }
   }
 
   disconnectedCallback() {

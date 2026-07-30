@@ -824,8 +824,8 @@
       >
         {% unless onboarding %}
           {% assign product_form_id = 'product-form-card-' | append: product.id | append: '-' | append: block.id %}
-          <h3 class="product-card__title">{{ product.title }}</h3>
-          <div class="product-card__price">
+          <h3 class="product-card__title fallback-title">{{ product.title }}</h3>
+          <div class="product-card__price fallback-price">
             <span class="product-card__current-price{% if discount_percent > 0 %} product-card__current-price--sale{% endif %}">{{ product.price | money }}</span>
             {% if discount_percent > 0 %}
               <span class="product-card__compare-price">{{ product.compare_at_price | money }}</span>
