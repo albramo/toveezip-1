@@ -48,6 +48,14 @@
       --color-rgb: {{ block_settings.text_color.rgb }};
     {% endif %}
     --width: {{ block_settings.width }};
+    {% if block_settings.font_bold %}
+      font-weight: bold !important;
+    {% else %}
+      font-weight: normal !important;
+    {% endif %}
+    {% if block_settings.price_font_size != blank %}
+      font-size: {{ block_settings.price_font_size }} !important;
+    {% endif %}
   "
   {{ block.shopify_attributes }}
 >
@@ -100,6 +108,44 @@
     {
       "type": "paragraph",
       "content": "t:content.edit_price_in_theme_settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "font_bold",
+      "label": "Bold Price / جعل السعر عريضاً (B)",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "price_font_size",
+      "label": "Price Size / حجم الخط للسعر",
+      "options": [
+        {
+          "value": "",
+          "label": "Default / الافتراضي"
+        },
+        {
+          "value": "0.85rem",
+          "label": "Small / صغير"
+        },
+        {
+          "value": "1rem",
+          "label": "Medium / متوسط"
+        },
+        {
+          "value": "1.15rem",
+          "label": "Large / كبير"
+        },
+        {
+          "value": "1.3rem",
+          "label": "Extra Large / كبير جداً"
+        },
+        {
+          "value": "1.5rem",
+          "label": "Huge / ضخم"
+        }
+      ],
+      "default": ""
     },
     {
       "type": "checkbox",

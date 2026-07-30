@@ -4060,7 +4060,8 @@ button.rec-add-to-cart-btn.is-loading::after {
   100% { transform: rotate(360deg); }
 }
 
-/* Color sale/discount prices in red */
+/* Color sale/discount prices in red and make them a bit larger ("كبير سيكا") */
 .price-item--sale {
   color: #e53935 !important;
+  font-size: 1.15em !important;
 }
