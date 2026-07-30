@@ -7,6 +7,19 @@
     assign product = collections.all.products.first
   endif
 
+  # Fetch the dynamic percentage discount from product metafield or block settings fallback
+  assign discount_percent = nil
+  if product.metafields.custom.pack_discount.value != blank
+    assign discount_percent = product.metafields.custom.pack_discount.value
+  elsif product.metafields.custom.pack_discount != blank
+    assign discount_percent = product.metafields.custom.pack_discount
+  endif
+
+  if discount_percent == blank
+    assign discount_percent = block.settings.fallback_discount | default: block.settings.default_discount_percent | default: 10
+  endif
+  assign discount_percent = discount_percent | plus: 0
+
   assign variant = closest.product.selected_or_first_available_variant
   assign inventory_quantity = variant.inventory_quantity
   assign inventory_policy = variant.inventory_policy
@@ -730,6 +743,26 @@
       "step": 1,
       "unit": "px",
       "default": 0
+    },
+    {
+      "type": "range",
+      "id": "fallback_discount",
+      "label": "Fallback Discount Percentage (%)",
+      "min": 1,
+      "max": 99,
+      "step": 1,
+      "default": 10,
+      "info": "Used if the product's metafield 'custom.pack_discount' is not configured."
+    },
+    {
+      "type": "range",
+      "id": "default_discount_percent",
+      "label": "Default Fallback Discount Percentage (%)",
+      "min": 1,
+      "max": 99,
+      "step": 1,
+      "default": 10,
+      "info": "Used if fallback_discount is empty."
     }
   ],
   "presets": [
