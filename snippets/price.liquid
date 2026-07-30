@@ -75,9 +75,6 @@
 -%}
 
 <div ref="priceContainer">
-  {% if show_compare_price and discount_percent > 0 %}
-    <span class="product-card__badge product-card__badge--sale">Save {{ discount_percent }}%</span>
-  {% endif %}
   {% if has_volume_pricing %}
     {% comment %} Volume pricing display {% endcomment %}
     {% if show_compare_price %}

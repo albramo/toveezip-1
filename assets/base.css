@@ -4059,3 +4059,8 @@ button.rec-add-to-cart-btn.is-loading::after {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+/* Color sale/discount prices in red */
+.price-item--sale {
+  color: #e53935 !important;
+}
