@@ -74,9 +74,8 @@ class CartDrawerComponent extends Component {
       event.target instanceof Element ? event.target.closest('dialog:modal') : null
     );
 
-    if (shouldAutoOpen && !sourceModal) {
-      this.#themeDrawer?.open();
-    }
+    // Do NOT open the drawer immediately upon clicking "Add to Cart" before the promise is resolved.
+    // It should only open after the product has been successfully added to the cart.
 
     event.promise
       ?.then(({ detail }) => {
