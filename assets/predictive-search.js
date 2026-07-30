@@ -57,11 +57,9 @@ class PredictiveSearchComponent extends Component {
       this.addEventListener('click', this.#handleModalClick, { signal });
     }
 
-    if (RecentlyViewed.getProducts().length > 0) {
-      requestIdleCallback(() => {
-        this.#loadEmptyState();
-      });
-    }
+    requestIdleCallback(() => {
+      this.#loadEmptyState();
+    });
   }
 
   /**
@@ -106,7 +104,7 @@ class PredictiveSearchComponent extends Component {
   };
 
   #handleDialogOpen = () => {
-    if (!this.#emptyStateLoaded && RecentlyViewed.getProducts().length > 0) {
+    if (!this.#emptyStateLoaded) {
       this.#loadEmptyState();
     }
   };
@@ -311,11 +309,35 @@ class PredictiveSearchComponent extends Component {
    * Fetch search results using the section renderer and update the results container.
    * @param {string} searchTerm - The term to search for
    */
+  onCategoryChange = (event) => {
+    const searchTerm = this.refs.searchInput.value.trim();
+    if (searchTerm.length > 0) {
+      this.#getSearchResults(searchTerm);
+    }
+  };
+
+  onSearchFormSubmit = (event) => {
+    const categorySelect = this.querySelector('.search-category-select');
+    const categoryHandle = categorySelect ? categorySelect.value : '';
+    if (categoryHandle) {
+      const originalValue = this.refs.searchInput.value;
+      if (!originalValue.includes(`collection:`)) {
+        this.refs.searchInput.value = `${originalValue} collection:${categoryHandle}`;
+      }
+    }
+  };
+
   async #getSearchResults(searchTerm) {
     if (!this.dataset.sectionId) return;
 
     const url = new URL(Theme.routes.predictive_search_url, location.origin);
-    url.searchParams.set('q', searchTerm);
+    const categorySelect = this.querySelector('.search-category-select');
+    const categoryHandle = categorySelect ? categorySelect.value : '';
+    let query = searchTerm;
+    if (categoryHandle) {
+      query = `${searchTerm} collection:${categoryHandle}`;
+    }
+    url.searchParams.set('q', query);
     url.searchParams.set('resources[limit_scope]', 'each');
 
     const { predictiveSearchResults } = this.refs;
@@ -417,29 +439,6 @@ class PredictiveSearchComponent extends Component {
       .querySelector('.predictive-search-empty-section');
 
     if (!parsedEmptySectionMarkup) throw new Error('No empty section markup found');
-
-    /** This needs to be awaited and not .then so the DOM is already morphed
-     * when #closeResults is called and therefore the height is animated */
-    const viewedProducts = RecentlyViewed.getProducts();
-
-    if (viewedProducts.length > 0) {
-      const recentlyViewedMarkup = await this.#getRecentlyViewedProductsMarkup();
-      if (!recentlyViewedMarkup) return;
-
-      const parsedRecentlyViewedMarkup = new DOMParser().parseFromString(recentlyViewedMarkup, 'text/html');
-      const recentlyViewedProductsHtml = parsedRecentlyViewedMarkup.getElementById('predictive-search-products');
-      if (!recentlyViewedProductsHtml) return;
-
-      for (const child of recentlyViewedProductsHtml.children) {
-        if (child instanceof HTMLElement) {
-          child.setAttribute('ref', 'recentlyViewedWrapper');
-        }
-      }
-
-      const collectionElement = parsedEmptySectionMarkup.querySelector('#predictive-search-products');
-      if (!collectionElement) return;
-      collectionElement.prepend(...recentlyViewedProductsHtml.children);
-    }
 
     if (abortController.signal.aborted) return;
 
