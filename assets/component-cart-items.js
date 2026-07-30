@@ -184,10 +184,18 @@ export class CartItemsComponent extends createViewEventElement(Component) {
     if (isEmptyCart && template instanceof HTMLTemplateElement) {
       const clone = document.importNode(template.content, true);
 
-      startViewTransition(() => {
-        document.getElementById('cart-drawer-heading')?.remove();
+      if (this.isDrawer) {
+        const drawer = document.getElementById('cart-drawer');
+        if (drawer && typeof drawer.close === 'function') {
+          drawer.close();
+        }
         this.replaceChildren(clone);
-      }, [this.isDrawer ? 'empty-cart-drawer' : 'empty-cart-page']);
+      } else {
+        startViewTransition(() => {
+          document.getElementById('cart-drawer-heading')?.remove();
+          this.replaceChildren(clone);
+        }, ['empty-cart-page']);
+      }
 
       return;
     }
