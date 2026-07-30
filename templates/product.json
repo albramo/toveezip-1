@@ -363,6 +363,15 @@
               },
               "blocks": {}
             },
+            "pack_selector_custom": {
+              "type": "pack-selector",
+              "settings": {
+                "title": "SELECT PACK",
+                "pack_1_title": "Pack of 1",
+                "pack_2_title": "Pack of 2",
+                "default_discount_percent": 10
+              }
+            },
             "buy_buttons_eYQEYi": {
               "type": "buy-buttons",
               "settings": {
@@ -465,6 +474,7 @@
             "group_icgrde",
             "divider_VJhene",
             "variant_picker_R3rGDr",
+            "pack_selector_custom",
             "buy_buttons_eYQEYi",
             "complete_routine_custom",
             "text_aEtTtq"
