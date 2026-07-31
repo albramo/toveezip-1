@@ -105,7 +105,8 @@ class StickyAddToCartComponent extends Component {
   }
 
   /**
-   * Sets up the IntersectionObserver to watch the buy buttons visibility
+   * Sets up the IntersectionObserver to watch the buy buttons visibility.
+   * This is defined as a reusable class method to avoid runtime errors on variant change.
    */
   #setupIntersectionObserver() {
     const productForm = this.#getProductForm();
@@ -318,6 +319,7 @@ class StickyAddToCartComponent extends Component {
   /**
    * Checks whether the Shopify Chat is active on the page.
    * When active, the sticky bar must stay hidden to avoid overlapping the chat UI.
+   * Defined as a private method in the class body.
    *
    * <shopify-chat> is rendered unconditionally by chat-drawer.liquid, but
    * the "Ask anything" button only paints once the Inbox app has installed
