@@ -9,16 +9,6 @@
     <span class="mobile-nav__label">Home</span>
   </a>
 
-  <button type="button" class="mobile-nav__item" on:click="#search-modal/showDialog">
-    <span class="svg-wrapper">
-      <svg aria-hidden="true" focusable="false" role="presentation" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="11" cy="11" r="8"></circle>
-        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-      </svg>
-    </span>
-    <span class="mobile-nav__label">Search</span>
-  </button>
-
   <button type="button" class="mobile-nav__item mobile-nav__cart" on:click="#cart-drawer/toggle">
     <cart-icon class="mobile-nav__cart-icon{% unless cart == empty %} mobile-nav__cart-icon--has-cart{% endunless %}" data-testid="cart-icon">
       <span class="svg-wrapper">
@@ -27,6 +17,16 @@
       {% render 'cart-bubble', limit: 100 %}
     </cart-icon>
     <span class="mobile-nav__label">Cart</span>
+  </button>
+
+  <button type="button" class="mobile-nav__item" on:click="#search-modal/showDialog">
+    <span class="svg-wrapper">
+      <svg aria-hidden="true" focusable="false" role="presentation" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+    </span>
+    <span class="mobile-nav__label">Search</span>
   </button>
 </div>
 
