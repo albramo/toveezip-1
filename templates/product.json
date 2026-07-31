@@ -162,7 +162,7 @@
             "icons_style": "chevron",
             "slideshow_controls_style": "thumbnails",
             "slideshow_mobile_controls_style": "thumbnails",
-            "thumbnail_position": "bottom",
+            "thumbnail_position": "left",
             "thumbnail_width": 60,
             "thumbnail_radius": 8,
             "aspect_ratio": "1",
@@ -487,7 +487,7 @@
       ],
       "settings": {
         "content_width": "content-center-aligned",
-        "desktop_media_position": "left",
+        "desktop_media_position": "right",
         "equal_columns": true,
         "limit_details_width": false,
         "gap": 48,
