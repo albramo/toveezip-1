@@ -16,12 +16,35 @@
   endif
   assign discount_percent = discount_percent | plus: 0
 
+  # Fetch the dynamic quantity for Pack 2 from product metafield or block settings fallback as requested by user
+  assign pack_2_quantity = nil
+  if product_resource.metafields.custom.pack_quantity.value != blank
+    assign pack_2_quantity = product_resource.metafields.custom.pack_quantity.value
+  elsif product_resource.metafields.custom.pack_quantity != blank
+    assign pack_2_quantity = product_resource.metafields.custom.pack_quantity
+  endif
+
+  if pack_2_quantity == blank
+    assign pack_2_quantity = block.settings.fallback_pack_quantity | default: 2
+  endif
+  assign pack_2_quantity = pack_2_quantity | plus: 0
+
+  # Localize and dynamically generate Pack 2 title if default is used
+  assign dynamic_pack_2_title = block_settings.pack_2_title
+  if dynamic_pack_2_title == "Pack of 2" or dynamic_pack_2_title == blank
+    if request.locale.iso_code == 'ar'
+      assign dynamic_pack_2_title = 'عرض ' | append: pack_2_quantity | append: ' حبة'
+    else
+      assign dynamic_pack_2_title = 'Pack of ' | append: pack_2_quantity
+    endif
+  endif
+
   # Calculations for Pack 1
   assign pack_1_price = current_variant.price
   assign pack_1_compare_price = current_variant.compare_at_price
 
   # Calculations for Pack 2
-  assign pack_2_original_price = current_variant.price | times: 2
+  assign pack_2_original_price = current_variant.price | times: pack_2_quantity
   assign discount_multiplier = 100 | minus: discount_percent
   assign pack_2_discounted_price = pack_2_original_price | times: discount_multiplier | divided_by: 100
   assign pack_2_save_amount = pack_2_original_price | minus: pack_2_discounted_price
@@ -110,10 +133,10 @@
       <!-- Pack of 2 Card -->
       <div
         class="pack-card"
-        data-quantity="2"
+        data-quantity="{{ pack_2_quantity }}"
         role="button"
         tabindex="0"
-        aria-label="{{ block_settings.pack_2_title | default: 'Pack of 2' }} - {{ p2_disc_formatted }}"
+        aria-label="{{ dynamic_pack_2_title }} - {{ p2_disc_formatted }}"
       >
         <!-- Save Badge -->
         <div class="pack-save-badge">
@@ -140,7 +163,7 @@
             {%- endif -%}
           </div>
           <div class="pack-card-info">
-            <span class="pack-card-name">{{ block_settings.pack_2_title | default: 'Pack of 2' }}</span>
+            <span class="pack-card-name">{{ dynamic_pack_2_title }}</span>
             <div class="pack-card-prices">
               <span class="pack-price-sale">{{ p2_disc_formatted }}</span>
               <span class="pack-price-compare">{{ p2_orig_formatted }}</span>
@@ -466,6 +489,16 @@
       "id": "pack_2_title",
       "label": "Pack of 2 Label",
       "default": "Pack of 2"
+    },
+    {
+      "type": "range",
+      "id": "fallback_pack_quantity",
+      "label": "Fallback Pack Quantity",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "default": 2,
+      "info": "Used if the product's metafield 'custom.pack_quantity' is not configured."
     },
     {
       "type": "range",
