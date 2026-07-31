@@ -179,8 +179,9 @@
     position: fixed;
     bottom: 24px;
     left: 50%;
-    transform: translateX(-50%) translateY(0) !important; /* Always visible */
-    opacity: 1 !important; /* Always visible */
+    transform: translateX(-50%) translateY(150%); /* Hidden by default */
+    opacity: 0; /* Hidden by default */
+    pointer-events: none; /* Ignore interactions when hidden */
     z-index: 90; /* Keep it below header and cart drawer */
     width: 720px !important; /* Wider horizontally */
     max-width: 90%;
@@ -195,8 +196,8 @@
     transition: opacity 0.3s ease, transform 0.3s ease !important;
 
     @starting-style {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
+      opacity: 0;
+      transform: translateX(-50%) translateY(150%);
     }
 
     &::before {
@@ -213,12 +214,11 @@
   .sticky-add-to-cart__bar[data-stuck='true'] {
     transform: translateX(-50%) translateY(0%) !important;
     opacity: 1 !important;
+    pointer-events: auto !important;
   }
 
   sticky-add-to-cart:not([data-variant-available='true']) .sticky-add-to-cart__bar {
-    opacity: 1 !important;
-    transform: translateX(-50%) translateY(0) !important;
-    display: flex !important; /* Keep it visible even if sold out, so the user knows it's sold out */
+    display: flex !important; /* Keep it flex even if sold out, so the user knows it's sold out */
   }
 
   .sticky-add-to-cart__info[data-has-image='false'] {

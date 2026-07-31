@@ -52,7 +52,6 @@
         class="predictive-search-form"
         ref="form"
         on:keydown="/onSearchKeyDown"
-        on:submit="/onSearchFormSubmit"
       >
         <div
           class="predictive-search-form__header"
@@ -71,6 +70,11 @@
                 <option value="{{ collection.handle }}">{{ collection.title }}</option>
               {%- endfor -%}
             </select>
+            <input
+              type="hidden"
+              name="filter.p.collection"
+              value=""
+            >
             <label
               for="{{ 'cmdk-input' | default: 'Search' }}"
               class="visually-hidden"

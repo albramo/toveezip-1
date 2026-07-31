@@ -310,20 +310,15 @@ class PredictiveSearchComponent extends Component {
    * @param {string} searchTerm - The term to search for
    */
   onCategoryChange = (event) => {
+    const categorySelect = this.querySelector('.search-category-select');
+    const categoryHandle = categorySelect ? categorySelect.value : '';
+    const hiddenInput = this.querySelector('input[name="filter.p.collection"]');
+    if (hiddenInput) {
+      hiddenInput.value = categoryHandle;
+    }
     const searchTerm = this.refs.searchInput.value.trim();
     if (searchTerm.length > 0) {
       this.#getSearchResults(searchTerm);
-    }
-  };
-
-  onSearchFormSubmit = (event) => {
-    const categorySelect = this.querySelector('.search-category-select');
-    const categoryHandle = categorySelect ? categorySelect.value : '';
-    if (categoryHandle) {
-      const originalValue = this.refs.searchInput.value;
-      if (!originalValue.includes(`collection:`)) {
-        this.refs.searchInput.value = `${originalValue} collection:${categoryHandle}`;
-      }
     }
   };
 
@@ -333,11 +328,10 @@ class PredictiveSearchComponent extends Component {
     const url = new URL(Theme.routes.predictive_search_url, location.origin);
     const categorySelect = this.querySelector('.search-category-select');
     const categoryHandle = categorySelect ? categorySelect.value : '';
-    let query = searchTerm;
+    url.searchParams.set('q', searchTerm);
     if (categoryHandle) {
-      query = `${searchTerm} collection:${categoryHandle}`;
+      url.searchParams.set('filter.p.collection', categoryHandle);
     }
-    url.searchParams.set('q', query);
     url.searchParams.set('resources[limit_scope]', 'each');
 
     const { predictiveSearchResults } = this.refs;
