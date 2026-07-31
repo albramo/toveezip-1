@@ -190,6 +190,11 @@
       this.slides.forEach((slide, i) => slide.classList.toggle('is-active', i === this.current));
       this.dots.forEach((dot, i) => dot.classList.toggle('is-active', i === this.current));
       this.dots.forEach((dot, i) => dot.setAttribute('aria-selected', i === this.current));
+
+      // Reset the autoplay timer on each transition to keep it perfectly synchronized with the CSS progress animation!
+      if (this.autoplay && this.timer) {
+        this.startAutoplay();
+      }
     }
 
     prev() {
@@ -336,11 +341,11 @@
   .tovee-hero-slider__dot.is-active::before {
     content: '';
     position: absolute;
-    top: 1.5px;
-    left: 1.5px;
-    bottom: 1.5px;
-    right: 1.5px;
-    border-radius: 100px;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    border-radius: inherit;
     background: #ffffff;
     clip-path: inset(0 100% 0 0); /* Start empty from left */
     animation: tovee-fill-progress var(--autoplay-speed, 5s) linear forwards;
