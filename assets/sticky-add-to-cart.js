@@ -121,8 +121,8 @@ class StickyAddToCartComponent extends Component {
           if (entry.isIntersecting) {
             this.#hideStickyBar();
           } else {
-            // Check if the button is scrolled past (above the viewport)
-            if (entry.boundingClientRect.bottom < 0) {
+            // Check if the button is scrolled past (above the viewport) and the user has scrolled down
+            if (entry.boundingClientRect.bottom < 0 && window.scrollY > 50) {
               if (!this.#isChatActive()) {
                 this.#showStickyBar();
               } else {
