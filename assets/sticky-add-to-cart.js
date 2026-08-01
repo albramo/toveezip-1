@@ -119,14 +119,11 @@ class StickyAddToCartComponent extends Component {
     if (this.#targetAddToCartButton) {
       this.#buyButtonsIntersectionObserver = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
-          const isDesktop = window.innerWidth >= 750;
-          const isScrolledPastDesktop = isDesktop && window.scrollY > 600;
-
-          if (entry.isIntersecting && !isScrolledPastDesktop) {
+          if (entry.isIntersecting) {
             this.#hideStickyBar();
           } else {
-            // Check if the button is scrolled past (above the viewport) or the user is on desktop and scrolled past the main fold
-            const isScrolledPast = entry.boundingClientRect.bottom < 0 || isScrolledPastDesktop;
+            // Check if the button is scrolled past (above the viewport)
+            const isScrolledPast = entry.boundingClientRect.bottom < 0;
             if (isScrolledPast && window.scrollY > 50) {
               if (!this.#isChatActive()) {
                 this.#showStickyBar();

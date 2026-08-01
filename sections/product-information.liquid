@@ -125,7 +125,7 @@
           >
             {% if current_variant.available %}
               <span class="svg-wrapper">
-                {{- 'icon-add-to-cart.svg' | inline_asset_content -}}
+                {{- 'icon-cart.svg' | inline_asset_content -}}
               </span>
             {% endif %}
             <span class="add-to-cart-text__content">
@@ -511,7 +511,7 @@
   .product-details [role="heading"] h1,
   .product-details h1 {
     font-family: var(--font-heading--family), sans-serif !important;
-    font-size: clamp(1.8rem, 4vw, 2.8rem) !important;
+    font-size: clamp(1.5rem, 3vw, 2.1rem) !important; /* Slightly smaller as requested by the user */
     font-weight: 700 !important;
     color: var(--color-brand-dark) !important;
     line-height: 1.25 !important;
