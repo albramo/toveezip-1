@@ -47,11 +47,7 @@
           aria-hidden="true"
           class="svg-wrapper add-to-cart-icon"
         >
-          {% if use_header_cart_icon %}
-            {{- 'icon-cart.svg' | inline_asset_content -}}
-          {% else %}
-            {{- 'icon-add-to-cart.svg' | inline_asset_content -}}
-          {% endif %}
+          {{- 'icon-cart.svg' | inline_asset_content -}}
         </span>
       {% endif %}
       <span class="add-to-cart-text__content{% if icon_only_on_mobile %} is-visually-hidden-mobile{% endif %}">

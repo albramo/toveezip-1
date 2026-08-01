@@ -137,20 +137,22 @@
 </div>
 
 {% stylesheet %}
-  .product-media {
+  .product-media,
+  .product-media-container {
     aspect-ratio: var(--gallery-aspect-ratio, var(--ratio));
     min-height: 0;
     min-width: 0;
-    overflow: hidden; /* Ensure zoomed-in image doesn't overflow the container */
+    overflow: hidden !important; /* Ensure zoomed-in image doesn't overflow the container */
   }
 
   .product-media__image {
     object-position: var(--focal-point, center center);
-    transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Smooth scale transition */
+    transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important; /* Smooth scale transition */
   }
 
-  .product-media:hover .product-media__image {
-    transform: scale(1.08); /* Grows/zooms in slightly (8%) on hover as requested by user */
+  .product-media:hover .product-media__image,
+  .product-media-container:hover .product-media__image {
+    transform: scale(1.15) !important; /* Grows/zooms in slightly (15%) on hover as requested by user */
   }
 
   /*** Media border-radius feature ****/
